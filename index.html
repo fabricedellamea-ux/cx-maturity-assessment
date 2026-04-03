@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact Center CX Maturity Assessment</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#faf5ff',
+              100: '#f3e8ff',
+              200: '#e9d5ff',
+              300: '#d8b4fe',
+              400: '#c084fc',
+              500: '#a855f7',
+              600: '#9333ea',
+              700: '#7e22ce',
+              800: '#6b21a8',
+              900: '#581c87',
+              950: '#3b0764',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .fade-in { animation: fadeIn 0.4s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .slide-up { animation: slideUp 0.5s ease-out; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .pulse-ring { animation: pulseRing 2s ease-out infinite; }
+    @keyframes pulseRing { 0% { transform: scale(0.9); opacity: 1; } 100% { transform: scale(1.3); opacity: 0; } }
+    .progress-fill { transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+    .bar-grow { animation: barGrow 1s ease-out forwards; }
+    @keyframes barGrow { from { width: 0; } }
+    .option-card { transition: all 0.2s ease; }
+    .option-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px -5px rgba(124, 58, 237, 0.15); }
+    .gauge-fill { transition: stroke-dashoffset 1.5s ease-out; }
+    .dot-pulse { animation: dotPulse 2s ease-in-out infinite; }
+    @keyframes dotPulse { 0%,100% { r: 8; opacity:1; } 50% { r: 11; opacity:0.7; } }
+
+    /* ── Print Styles ─────────────────────────────────────────────── */
+    @media print {
+      body { background: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .no-print { display: none !important; }
+      .report-page { page-break-after: always; page-break-inside: avoid; padding: 48px 40px; min-height: 100vh; box-shadow: none !important; margin: 0 !important; border: none !important; border-radius: 0 !important; }
+      .report-page:last-child { page-break-after: auto; }
+      .report-page * { box-shadow: none !important; }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect, useCallback, useMemo } = React;
+
+    // ─── Assessment Data ─────────────────────────────────────────────
+    const SECTIONS = [
+      {
+        id: 'infrastructure',
+        title: 'Infrastructure',
+        icon: 'Server',
+        description: 'Evaluate your foundational contact center technology stack',
+        questions: [
+          {
+            id: 'infra-1',
+            text: 'How is your contact center infrastructure currently deployed?',
+            options: [
+              { label: 'On-premise hardware and software', score: 0 },
+              { label: 'Single-tenant hosted (private cloud)', score: 2 },
+              { label: 'Multi-tenant Cloud Solution (CCaaS)', score: 4 },
+            ],
+          },
+          {
+            id: 'infra-2',
+            text: 'How consolidated is your communication technology stack?',
+            options: [
+              { label: 'Very fragmented — different vendors for UCaaS, CCaaS, and Bots/AI', score: 0 },
+              { label: 'Consolidated Communication — UCaaS & CCaaS from same vendor, Bots standalone', score: 1 },
+              { label: 'Consolidated Interaction — CCaaS & Bots from same vendor, UCaaS standalone', score: 2 },
+              { label: 'Truly unified platform with UCaaS, CCaaS, and AI agents from one single vendor', score: 4 },
+            ],
+          },
+          {
+            id: 'infra-3',
+            text: 'How is your CRM integrated with your contact center?',
+            options: [
+              { label: 'No CRM integration', score: 0 },
+              { label: 'Yes, via back-office APIs only (data sync)', score: 2 },
+              { label: 'Yes, with call control embedded inside the CRM', score: 4 },
+            ],
+          },
+          {
+            id: 'infra-4',
+            text: 'How open is your contact center ecosystem for third-party integrations and extensibility?',
+            options: [
+              { label: 'Closed system — no APIs or marketplace; all customization requires vendor involvement', score: 0 },
+              { label: 'Limited APIs available, but integrations require significant custom development', score: 1 },
+              { label: 'Open APIs with a partner ecosystem, but no low-code tools for business users', score: 3 },
+              { label: 'Full open platform with open APIs, pre-built integrations, and embeddable communication widgets', score: 4 },
+            ],
+          },
+          {
+            id: 'infra-5',
+            text: 'What level of reliability and availability does your platform provide?',
+            options: [
+              { label: 'Frequent outages, limited SLA', score: 0 },
+              { label: 'Reasonable uptime (~99.9%)', score: 2 },
+              { label: 'High availability (~99.99%)', score: 4 },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'automation',
+        title: 'Automation',
+        icon: 'Bot',
+        description: 'Assess your self-service capabilities and intelligent automation maturity',
+        questions: [
+          {
+            id: 'auto-1',
+            text: 'What type of self-service do you offer customers on voice channels?',
+            options: [
+              { label: 'Basic touch-tone IVR with static menus', score: 0 },
+              { label: 'Speech-enabled IVR with keyword recognition', score: 1 },
+              { label: 'Conversational IVA (Intelligent Virtual Agent) with NLU for common intents', score: 3 },
+              { label: 'Agentic AI voice/chat agent with autonomous decisions and complex workflows (authentication, scheduling, etc.)', score: 4 },
+            ],
+          },
+          {
+            id: 'auto-2',
+            text: 'How do you handle digital self-service (chat, web, messaging)?',
+            options: [
+              { label: 'No digital self-service — all inquiries go directly to agents', score: 0 },
+              { label: 'Basic FAQ with scripted, rule-based responses', score: 1 },
+              { label: 'Generative AI chatbot with knowledge base retrieval', score: 3 },
+              { label: 'Omnichannel Agentic AI built once for voice and digital interactions with knowledge retrieval and autonomous actions', score: 4 },
+            ],
+          },
+          {
+            id: 'auto-3',
+            text: 'How do you build and deploy self-service automation workflows?',
+            options: [
+              { label: 'All automation requires vendor professional services or heavy developer involvement', score: 0 },
+              { label: 'Some automation built with developer-centric tools (scripting, APIs)', score: 1 },
+              { label: 'Low-code visual builder available, but limited to basic flows and requires technical knowledge', score: 3 },
+              { label: 'No-code conversational AI builder with pre-built connectors for external actions, for both voice and digital', score: 4 },
+            ],
+          },
+          {
+            id: 'auto-4',
+            text: 'How do you identify which interactions should be automated next?',
+            options: [
+              { label: 'No data-driven approach — automation decisions are based on gut feel', score: 0 },
+              { label: 'We review call logs manually to spot repetitive topics', score: 1 },
+              { label: 'We use basic analytics to identify top call drivers and prioritize automation', score: 3 },
+              { label: 'AI-powered conversation mining tool to identify which interactions to automate for maximum impact', score: 4 },
+            ],
+          },
+          {
+            id: 'auto-5',
+            text: 'How seamless is the handoff from self-service to a live agent?',
+            options: [
+              { label: 'No context is passed — customer must repeat everything', score: 0 },
+              { label: 'Basic context (e.g., intent or account number) is transferred to the agent', score: 1 },
+              { label: 'Full conversation transcript is transferred, but routing is basic', score: 3 },
+              { label: 'AI recap of agentic conversation is transferred to the agent (context, sentiment, etc.) to avoid repeat', score: 4 },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'coaching',
+        title: 'Coaching',
+        icon: 'GraduationCap',
+        description: 'Measure your quality management and real-time agent assistance capabilities',
+        questions: [
+          {
+            id: 'coach-1',
+            text: 'How do you evaluate agent interaction quality today?',
+            options: [
+              { label: 'Random manual review of a small sample of calls by supervisors', score: 0 },
+              { label: 'Structured QA scorecard applied manually to a percentage of interactions', score: 1 },
+              { label: 'Partially automated QA with speech analytics on some interactions', score: 3 },
+              { label: 'Fully AI-powered automatic scorecard leveraging LLM models', score: 4 },
+            ],
+          },
+          {
+            id: 'coach-2',
+            text: 'What real-time assistance tools do your agents have during live interactions?',
+            options: [
+              { label: 'None — agents rely on their training and static knowledge bases', score: 0 },
+              { label: 'Basic knowledge base search or canned response library', score: 1 },
+              { label: 'Real-time knowledge surfacing based on conversation keywords', score: 3 },
+              { label: 'Real-time knowledge surfacing based on LLM models and the conversation (e.g. battle cards, objection handling, etc.)', score: 4 },
+            ],
+          },
+          {
+            id: 'coach-3',
+            text: 'How are supervisors equipped to monitor and coach their teams?',
+            options: [
+              { label: 'No live monitoring — supervisors review recordings after the fact', score: 0 },
+              { label: 'Live silent monitoring and whisper coaching on voice calls only', score: 1 },
+              { label: 'Real-time transcript, silent monitoring and coaching for voice and digital conversations', score: 3 },
+              { label: 'Automatic supervisor alerts on customer sentiment or when certain topics are discussed (e.g. cancellation, competitor mention, etc.)', score: 4 },
+            ],
+          },
+          {
+            id: 'coach-4',
+            text: 'How do you measure customer satisfaction across interactions?',
+            options: [
+              { label: 'Post-call surveys (CSAT/NPS) sent to customers — typically 10-15% response rate', score: 0 },
+              { label: 'Surveys plus basic keyword-based sentiment detection on a subset of calls', score: 1 },
+              { label: 'Sentiment analysis on most interactions, supplemented by survey data', score: 3 },
+              { label: 'AI-inferred customer satisfaction on 100% of interactions (voice and digital)', score: 4 },
+            ],
+          },
+          {
+            id: 'coach-5',
+            text: 'How do you handle post-interaction wrap-up and documentation?',
+            options: [
+              { label: 'Agents manually type notes and disposition codes after every interaction', score: 0 },
+              { label: 'Pre-defined disposition codes and templates reduce some manual effort', score: 1 },
+              { label: 'Partial automation — auto-generated summaries that agents must review and edit', score: 3 },
+              { label: 'AI-generated call recap with action items and answers to key questions covered during the call', score: 4 },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'wfm',
+        title: 'Workforce Management',
+        icon: 'Users',
+        description: 'Evaluate your forecasting, scheduling, and employee engagement strategies',
+        questions: [
+          {
+            id: 'wfm-1',
+            text: 'How do you forecast contact volume and staffing needs?',
+            options: [
+              { label: 'Manual spreadsheets based on historical averages and gut feel', score: 0 },
+              { label: 'Basic WFM tool with historical trend analysis and simple algorithms', score: 2 },
+              { label: 'Multi-skill, multi-channel forecasting with what-if scenario modeling', score: 4 },
+            ],
+          },
+          {
+            id: 'wfm-2',
+            text: 'How do you create and manage agent schedules?',
+            options: [
+              { label: 'Manual scheduling in spreadsheets; changes are communicated via email', score: 0 },
+              { label: 'WFM tool generates schedules, but changes require supervisor approval and manual adjustment', score: 1 },
+              { label: 'Automated schedule optimization with shift bidding and agent preference inputs', score: 3 },
+              { label: 'Dynamic scheduling with intraday re-optimization and native integration to back-office HR systems for compliance and time-off requests', score: 4 },
+            ],
+          },
+          {
+            id: 'wfm-3',
+            text: 'How do you monitor real-time operations and queue health?',
+            options: [
+              { label: 'No real-time visibility — metrics reviewed only at end of day/week', score: 0 },
+              { label: 'Basic real-time dashboards showing queue length and wait times', score: 1 },
+              { label: 'Live dashboards with alerts for KPI breaches across multiple queues', score: 3 },
+              { label: 'Live dashboard with real-time adherence on omnichannel activity and agent state, including back-office work (e.g. support tickets)', score: 4 },
+            ],
+          },
+          {
+            id: 'wfm-4',
+            text: 'How effectively does your platform help reduce agent attrition and burnout?',
+            options: [
+              { label: 'No tools or strategies specifically addressing agent wellbeing or attrition', score: 0 },
+              { label: 'Basic productivity metrics tracked, but no connection to engagement or burnout', score: 1 },
+              { label: 'Balanced scorecards combining productivity with some quality metrics', score: 3 },
+              { label: 'AI-powered tools to help with onboarding and retention, e.g. real-time assist tools, automatic coaching, etc.', score: 4 },
+            ],
+          },
+          {
+            id: 'wfm-5',
+            text: 'How do you leverage AI to reduce overall contact volume and improve efficiency?',
+            options: [
+              { label: 'No strategy to reduce contact volume — all interactions are handled by live agents', score: 0 },
+              { label: 'Basic self-service (IVR, FAQ pages) deflects a small percentage of contacts', score: 1 },
+              { label: 'AI chatbots and IVAs handle some inquiries, but adoption is limited and inconsistent', score: 3 },
+              { label: 'Autonomous AI agents to deflect a majority of routine interactions, including proactive outreach to update customers before they contact you', score: 4 },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'ai-insights',
+        title: 'AI & Insights',
+        icon: 'Brain',
+        description: 'Assess your use of AI, analytics, and data-driven decision making',
+        questions: [
+          {
+            id: 'ai-1',
+            text: 'What powers the AI capabilities in your contact center?',
+            options: [
+              { label: 'No AI capabilities currently deployed', score: 0 },
+              { label: 'Generic third-party AI/LLM bolted onto our existing platform', score: 1 },
+              { label: 'Vendor-provided AI features, but built on general-purpose models not trained on contact center data', score: 3 },
+              { label: 'Purpose-built AI model trained on relevant business conversations', score: 4 },
+            ],
+          },
+          {
+            id: 'ai-2',
+            text: 'How do you use real-time transcription and conversation intelligence?',
+            options: [
+              { label: 'No transcription — agents take manual notes during calls', score: 0 },
+              { label: 'Post-call transcription available for review after interactions end', score: 1 },
+              { label: 'Real-time transcription during calls, but limited accuracy and no speaker identification', score: 3 },
+              { label: 'Real-time transcription with speaker identification and topic identification', score: 4 },
+            ],
+          },
+          {
+            id: 'ai-3',
+            text: 'How do you analyze customer sentiment across interactions?',
+            options: [
+              { label: 'No sentiment analysis — rely on post-call surveys only', score: 0 },
+              { label: 'Basic keyword-based sentiment detection on a subset of interactions', score: 1 },
+              { label: 'Real-time sentiment analysis on most interactions, but limited to positive/negative classification', score: 3 },
+              { label: 'Real-time AI engine with custom-built models (sentiments, CSAT, topics, etc.)', score: 4 },
+            ],
+          },
+          {
+            id: 'ai-4',
+            text: 'How do you use analytics and reporting to drive CX decisions?',
+            options: [
+              { label: 'Static historical reports generated manually (Excel, email)', score: 0 },
+              { label: 'Centralized dashboards with standard KPIs and drill-down capability', score: 1 },
+              { label: 'Real-time operational dashboards with automated alerting', score: 3 },
+              { label: 'Unified analytics with real-time dashboards, heatmaps, IVR analytics, BI tool integrations, auto-saving customizable reports, plus AI-powered insights including call purpose detection and conversation trend analysis', score: 4 },
+            ],
+          },
+          {
+            id: 'ai-5',
+            text: 'How do you govern and ensure responsible, safe use of AI in your CX operations?',
+            options: [
+              { label: 'No AI governance — AI tools (if any) are used ad-hoc with no oversight', score: 0 },
+              { label: 'Basic guidelines exist, but no formal governance, bias testing, or compliance monitoring', score: 1 },
+              { label: 'Formal AI governance with bias monitoring and periodic audits, but enforcement is manual', score: 3 },
+              { label: 'Built-in AI governance model automatically checking for compliance, PII, etc.', score: 4 },
+            ],
+          },
+        ],
+      },
+    ];
+
+    const MATURITY_LEVELS = [
+      { name: 'Reactive', min: 0, max: 20, color: 'from-red-500 to-red-600', bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700', barColor: '#ef4444', description: 'Your contact center is operating in a reactive, legacy mode. Significant modernization is needed across all dimensions to meet current customer expectations.' },
+      { name: 'Emerging', min: 21, max: 40, color: 'from-orange-500 to-orange-600', bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-700', barColor: '#f97316', description: 'You\'ve started your modernization journey but still rely heavily on manual processes and fragmented tools. Consolidating onto a truly unified platform with built-in AI would eliminate integration overhead and unlock immediate efficiency gains.' },
+      { name: 'Scaling', min: 41, max: 60, color: 'from-yellow-500 to-yellow-600', bg: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-700', barColor: '#eab308', description: 'Your contact center has solid foundations with room to grow. To reach the next level, prioritize AI-powered automation, 100% quality monitoring coverage, and AI-inferred customer satisfaction analysis to close your remaining gaps.' },
+      { name: 'Optimizing', min: 61, max: 80, color: 'from-brand-500 to-brand-600', bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-700', barColor: '#9333ea', description: 'You\'re operating at a high level with strong technology adoption. To reach Visionary status, focus on purpose-built AI deeply embedded across your platform, no-code automation tooling, and unified AI governance.' },
+      { name: 'Visionary', min: 81, max: 100, color: 'from-emerald-500 to-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700', barColor: '#10b981', description: 'Congratulations — your contact center is best-in-class. You\'re leveraging purpose-built AI, autonomous virtual agents, real-time coaching, and unified governance. Continue innovating and measuring impact across every customer interaction.' },
+    ];
+
+    const SECTION_RECS = {
+      infrastructure: [
+        'Migrate to a cloud-native platform with dual-cloud architecture for 100% uptime.',
+        'Consolidate UCaaS + CCaaS + AI onto a single platform like Dialpad Connect + Support + Sell.',
+        'Embed communications inside your CRM with native integrations across Salesforce, HubSpot, and 70+ apps.',
+        'Leverage an open ecosystem with APIs and an App Marketplace plus Dialpad Everywhere.',
+        'Ensure enterprise-grade compliance with SOC 2 Type II, HIPAA, GDPR, and Guardian governance.',
+      ],
+      automation: [
+        'Replace legacy IVR with autonomous Ai Voice Agents — achieving 62%+ deflection rates.',
+        'Deploy Ai Chatbots connected to your knowledge sources for omnichannel digital self-service.',
+        'Empower business users with no-code Agent Studio — no developers required.',
+        'Use Skill Mining to automatically identify and prioritize automation opportunities.',
+        'Ensure seamless Ai-to-human handoffs with complete conversation context and skills-based routing.',
+      ],
+      coaching: [
+        'Deploy Ai Scorecards to automatically grade 100% of conversations in real time.',
+        'Equip agents with Ai Agent Assist, Ai Live Coach Cards, and Ai Playbooks.',
+        'Give supervisors the Ai Coaching Hub with leaderboards and targeted coaching insights.',
+        'Replace post-call surveys with Ai CSAT for 91%+ satisfaction coverage.',
+        'Eliminate manual wrap-up with Ai Recaps — reducing ACW by 50%.',
+      ],
+      wfm: [
+        'Adopt AI-powered forecasting with heatmaps and call volume pattern analysis.',
+        'Enable dynamic AI-driven scheduling with intraday reoptimization on a unified platform.',
+        'Deploy real-time wallboards with queue health metrics and sentiment alerts.',
+        'Reduce agent attrition by 20% with AI-assisted coaching at scale.',
+        'Let Ai Agents handle routine interactions — saving 30+ hours per agent monthly.',
+      ],
+      'ai-insights': [
+        'Adopt a purpose-built AI engine like DialpadGPT — trained on 6B+ real business conversations.',
+        'Deploy real-time transcription with speaker identification and keyword detection.',
+        'Implement multi-layered sentiment analysis powering real-time alerts and Ai CSAT.',
+        'Leverage unified analytics with heatmaps, BI integrations, and Call Purpose detection.',
+        'Establish AI governance with Guardian — real-time compliance, PII protection, and audit logs.',
+      ],
+    };
+
+    // ─── Bridge Logic Data ───────────────────────────────────────────
+    const BRIDGE_LOGIC = {
+      infrastructure: {
+        bridgeName: 'The Velocity Gap',
+        icon: 'Zap',
+        headline: 'Your infrastructure is holding back your CX velocity',
+        situation: 'Organizations running on-premise or fragmented cloud solutions face a compounding disadvantage. Multi-tenant cloud platforms receive weekly feature updates and continuous AI improvements, while legacy systems lag by months or years. Every quarter of delay widens the gap between your customer experience and what modern consumers expect.',
+        insight: 'According to industry benchmarks, cloud-native contact centers deploy new capabilities 47x faster than on-premise environments. The shift from CapEx to OpEx alone can reduce total cost of ownership by 30-40%, while dual-cloud architectures like Dialpad\'s eliminate single points of failure entirely.',
+        keyMetrics: ['100% uptime SLA with dual-cloud architecture', 'Weekly platform updates vs. annual upgrade cycles', '30-40% reduction in total cost of ownership', '70+ pre-built integrations available immediately'],
+        actions: [
+          'Conduct a Total Cost of Ownership (TCO) analysis comparing your current infrastructure maintenance costs against a cloud-native platform',
+          'Identify your top 5 integration pain points and map them to pre-built marketplace connectors',
+          'Plan a phased migration starting with a pilot team of 25-50 agents to validate performance',
+          'Evaluate platforms offering true UCaaS + CCaaS + AI unification to eliminate multi-vendor overhead',
+          'Prioritize vendors with built-in compliance frameworks (SOC 2, HIPAA, GDPR) to reduce audit burden',
+        ],
+        businessValue: 'Organizations that migrate to unified cloud-native platforms typically see a 3-6 month payback period, with ongoing savings of 25-40% in operational costs while gaining access to AI capabilities that would take years to build internally.',
+        dialpadFit: 'Dialpad\'s dual-cloud architecture delivers a 100% uptime SLA, while its truly unified platform (Connect + Support + Sell) eliminates vendor fragmentation. With 70+ native integrations and Dialpad Everywhere, your team can work from any tool they already use.',
+      },
+      automation: {
+        bridgeName: 'The Agentic AI Leap',
+        icon: 'Bot',
+        headline: 'Manual handling of routine interactions is draining your team and your budget',
+        situation: 'Traditional IVR systems force customers through rigid menu trees, creating frustration and driving up handle times. Meanwhile, your most expensive resource — trained agents — spend significant time on repetitive, low-complexity inquiries that could be resolved autonomously. This misallocation erodes both customer satisfaction and agent morale.',
+        insight: 'The contact center industry is undergoing a fundamental shift from "routing" to "resolving." Agentic AI doesn\'t just direct callers — it reasons through complex workflows using LLMs to deliver actual outcomes. Leading platforms now achieve 62%+ autonomous deflection rates, meaning the majority of routine interactions never require a human agent.',
+        keyMetrics: ['62%+ autonomous deflection rate with Ai Agents', '30+ hours saved per agent per month', '50% reduction in after-call work time', 'No-code deployment via Agent Studio'],
+        actions: [
+          'Audit your top 10 call drivers by volume — identify which can be fully automated with current AI capabilities',
+          'Pilot an Ai Voice Agent for your highest-volume, lowest-complexity use case (e.g., appointment scheduling, order status)',
+          'Deploy Ai Chatbots across your digital channels connected to your existing knowledge base',
+          'Use Skill Mining to let AI analyze your conversation data and prioritize the next automation opportunities',
+          'Establish a Proving Ground for testing Ai Agents before live deployment to ensure quality and safety',
+        ],
+        businessValue: 'Each percentage point of deflection gained translates directly to reduced staffing costs and shorter wait times. At 62% deflection, a 200-agent center could reallocate 120+ agent-equivalents of capacity toward complex, high-value interactions.',
+        dialpadFit: 'Dialpad\'s Ai Agent platform provides autonomous voice and digital agents that resolve — not just route — customer inquiries. Agent Studio lets business users build and deploy these agents without code, while Skill Mining automatically identifies what to automate next based on real conversation data.',
+      },
+      coaching: {
+        bridgeName: 'From Sampling to Total Coverage',
+        icon: 'GraduationCap',
+        headline: 'You\'re only seeing a fraction of your quality picture',
+        situation: 'Manual QA processes typically evaluate 1-3% of interactions through random sampling. This means 97%+ of customer conversations are invisible to your quality program — including the ones where things go wrong. By the time a quality issue is identified through periodic reviews, the damage to customer relationships has already been done.',
+        insight: 'AI-powered quality management flips this model entirely. Instead of catching errors weeks after they occur, real-time coaching catches them during the conversation. And instead of surveying 10-15% of customers for satisfaction data, Ai-inferred CSAT can predict satisfaction on 91%+ of all interactions — giving you 6x better visibility without any survey fatigue.',
+        keyMetrics: ['100% of conversations auto-scored via Ai Scorecards', '91% Ai CSAT coverage vs. 15% industry survey average', '50% reduction in wrap-up time with Ai Recaps', '40% improvement in coaching efficiency'],
+        actions: [
+          'Define your quality criteria and scorecard dimensions — the foundation for automated Ai Scorecard grading',
+          'Deploy real-time agent assist to surface knowledge, compliance alerts, and guided playbooks during live interactions',
+          'Implement Ai CSAT to replace or supplement post-call surveys and gain satisfaction visibility on every conversation',
+          'Establish an Ai Coaching Hub where supervisors can see leaderboards, scorecard trends, and prioritized coaching queues',
+          'Use Ai Recaps to auto-generate call summaries and action items, freeing agents from manual note-taking',
+        ],
+        businessValue: 'Organizations that move from manual sampling to AI-powered total coverage see quality improvements of 15-25% within the first quarter, while reducing QA team workload by up to 60%. Real-time coaching prevents issues rather than documenting them after the fact.',
+        dialpadFit: 'Dialpad\'s Ai Scorecards grade every conversation automatically. Ai Agent Assist and Ai Live Coach Cards provide real-time guidance, while Ai CSAT infers satisfaction on 91%+ of calls. The Ai Coaching Hub gives supervisors a single command center for data-driven coaching.',
+      },
+      wfm: {
+        bridgeName: 'The Adaptive Workforce',
+        icon: 'Users',
+        headline: 'Static scheduling cannot keep up with dynamic customer demand',
+        situation: 'Workforce management built on spreadsheets and manual processes creates a constant tension between overstaffing (wasted budget) and understaffing (poor service levels). Without AI-driven forecasting and real-time adaptation, your operation is always either bleeding money or bleeding customers.',
+        insight: 'Modern WFM powered by AI reduces overstaffing by up to 25% while simultaneously improving service levels. When WFM is unified with your contact center and AI platform, the feedback loop becomes instant — AI-powered deflection directly reduces required staffing, and real-time adherence tools catch issues before they impact queues.',
+        keyMetrics: ['20% reduction in agent attrition', '40% improvement in coaching efficiency', '25% reduction in overstaffing through AI forecasting', 'Real-time intraday schedule reoptimization'],
+        actions: [
+          'Implement AI-powered forecasting that analyzes historical patterns and external signals for accurate staffing predictions',
+          'Deploy real-time wallboards with queue health, sentiment alerts, and automatic callback management',
+          'Enable agent self-service for shift swaps, overtime sign-ups, and preference management via mobile',
+          'Measure and address agent burnout through balanced scorecards that go beyond pure productivity metrics',
+          'Calculate the cost savings from AI deflection — every resolved self-service interaction reduces future staffing requirements',
+        ],
+        businessValue: 'A 200-agent contact center that reduces attrition by 20% saves approximately $800K-$1.2M annually in recruiting and training costs alone. Add AI-driven schedule optimization and the savings compound further.',
+        dialpadFit: 'Dialpad\'s unified platform means WFM, contact center, and AI all share the same data layer. Heatmaps reveal call volume patterns, AI-driven scheduling adapts intraday, and Ai Agents reduce the volume your human workforce needs to handle — creating a virtuous efficiency cycle.',
+      },
+      'ai-insights': {
+        bridgeName: 'Predictive CX Intelligence',
+        icon: 'Brain',
+        headline: 'You\'re making CX decisions without complete data',
+        situation: 'Most contact centers operate on lagging indicators — reviewing yesterday\'s dashboards to make today\'s decisions. Post-call surveys capture only 10-15% of customer sentiment, leaving massive blind spots. Without real-time, AI-powered insights, you\'re steering your CX strategy with an incomplete map.',
+        insight: 'Purpose-built AI changes everything. Unlike generic LLMs bolted onto existing platforms, AI trained specifically on billions of minutes of business conversations delivers dramatically higher accuracy for transcription, sentiment analysis, and intent detection. This purpose-built approach powers predictive capabilities that generic tools simply cannot match.',
+        keyMetrics: ['6B+ minutes of training data powering DialpadGPT', '30+ hours saved per agent monthly via Ai Transcription', '91%+ Ai-inferred CSAT coverage', 'Real-time sentiment and Call Purpose detection'],
+        actions: [
+          'Evaluate the AI foundation of your current platform — is it purpose-built for CX or a generic model with CX features added?',
+          'Deploy real-time transcription across 100% of conversations for searchable archives and instant insights',
+          'Implement multi-layered sentiment analysis that feeds real-time supervisor alerts for at-risk conversations',
+          'Move beyond descriptive dashboards to predictive analytics that recommend actions, not just report metrics',
+          'Establish an AI governance framework with real-time compliance monitoring and automated PII protection',
+        ],
+        businessValue: 'Organizations leveraging purpose-built CX AI report 20-35% improvements in first-contact resolution and 15-25% reductions in average handle time. Predictive CSAT alone eliminates the cost of survey programs while delivering 6x better coverage.',
+        dialpadFit: 'DialpadGPT is purpose-built on 6B+ minutes of real business conversations — not a generic model. This powers industry-leading transcription accuracy, Ai CSAT on 91%+ of conversations, real-time sentiment analysis, and Guardian governance for responsible AI use.',
+      },
+    };
+
+    // ─── Shared Utility ──────────────────────────────────────────────
+    function computeScores(answers) {
+      const sectionScores = SECTIONS.map((section) => {
+        const maxScore = section.questions.length * 4;
+        let earned = 0;
+        const questionScores = [];
+        section.questions.forEach((q, qi) => {
+          const globalIdx = SECTIONS.slice(0, SECTIONS.indexOf(section)).reduce((a, s) => a + s.questions.length, 0) + qi;
+          const ansIdx = answers[globalIdx];
+          const qScore = (ansIdx !== null && ansIdx !== undefined) ? q.options[ansIdx].score : 0;
+          earned += qScore;
+          questionScores.push({ question: q.text, score: qScore, maxScore: 4, answerLabel: (ansIdx !== null && ansIdx !== undefined) ? q.options[ansIdx].label : 'Not answered' });
+        });
+        const pct = Math.round((earned / maxScore) * 100);
+        return { id: section.id, title: section.title, icon: section.icon, earned, maxScore, pct, questionScores };
+      });
+      const totalEarned = sectionScores.reduce((a, s) => a + s.earned, 0);
+      const totalMax = sectionScores.reduce((a, s) => a + s.maxScore, 0);
+      const totalScore = Math.round((totalEarned / totalMax) * 100);
+      const level = MATURITY_LEVELS.find(l => totalScore >= l.min && totalScore <= l.max) || MATURITY_LEVELS[0];
+      const sorted = [...sectionScores].sort((a, b) => a.pct - b.pct);
+      return { sectionScores, totalScore, level, sorted };
+    }
+
+    const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxKO9xa0HABN1MqWGqOSzaGwEnNS-k0TCoNOlImx6iMFjLLmd0qALa-X2X1Xpa_r2iv/exec';
+
+    // ─── Icon Component ──────────────────────────────────────────────
+    function Icon({ name, size = 20, className = '' }) {
+      const ref = React.useRef(null);
+      useEffect(() => {
+        if (ref.current && lucide.icons[name]) {
+          ref.current.innerHTML = '';
+          const svg = lucide.createElement(lucide.icons[name]);
+          svg.setAttribute('width', size);
+          svg.setAttribute('height', size);
+          if (className) svg.setAttribute('class', className);
+          ref.current.appendChild(svg);
+        }
+      }, [name, size, className]);
+      return React.createElement('span', { ref, className: 'inline-flex items-center justify-center' });
+    }
+
+    // ─── Progress Bar ────────────────────────────────────────────────
+    function ProgressBar({ current, total, sections, currentSection }) {
+      const pct = Math.round((current / total) * 100);
+      return (
+        <div className="w-full mb-8">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm font-medium text-gray-500">Question {current} of {total}</span>
+            <span className="text-sm font-semibold text-brand-700">{pct}% Complete</span>
+          </div>
+          <div className="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
+            <div className="progress-fill h-full bg-gradient-to-r from-brand-500 to-brand-600 rounded-full" style={{ width: `${pct}%` }} />
+          </div>
+          <div className="flex mt-4 gap-1">
+            {sections.map((s, i) => (
+              <div key={s.id} className="flex-1 flex flex-col items-center">
+                <div className={`w-full h-1.5 rounded-full transition-colors duration-300 ${i < currentSection ? 'bg-brand-600' : i === currentSection ? 'bg-brand-400' : 'bg-gray-200'}`} />
+                <span className={`text-[10px] mt-1.5 font-medium transition-colors ${i <= currentSection ? 'text-brand-700' : 'text-gray-400'}`}>{s.title}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // ─── S-Curve Maturity Map ────────────────────────────────────────
+    function SCurveMap({ score, compact = false }) {
+      const w = compact ? 400 : 520;
+      const h = compact ? 160 : 200;
+      const pad = { l: 45, r: 25, t: 20, b: 35 };
+      const gw = w - pad.l - pad.r;
+      const gh = h - pad.t - pad.b;
+
+      // S-curve points
+      const curvePoints = [];
+      for (let i = 0; i <= 100; i++) {
+        const t = i / 100;
+        const x = pad.l + t * gw;
+        const y = pad.t + gh - (1 / (1 + Math.exp(-10 * (t - 0.5)))) * gh;
+        curvePoints.push(`${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`);
+      }
+      const pathD = curvePoints.join(' ');
+
+      // User position
+      const t = Math.max(0, Math.min(100, score)) / 100;
+      const ux = pad.l + t * gw;
+      const uy = pad.t + gh - (1 / (1 + Math.exp(-10 * (t - 0.5)))) * gh;
+
+      const levels = [
+        { name: 'Reactive', pos: 0.1, color: '#ef4444' },
+        { name: 'Emerging', pos: 0.3, color: '#f97316' },
+        { name: 'Scaling', pos: 0.5, color: '#eab308' },
+        { name: 'Optimizing', pos: 0.7, color: '#9333ea' },
+        { name: 'Visionary', pos: 0.9, color: '#10b981' },
+      ];
+
+      return (
+        <svg viewBox={`0 0 ${w} ${h}`} className="w-full" style={{ maxWidth: compact ? 400 : 520 }}>
+          {/* Grid lines */}
+          {levels.map((lv) => {
+            const lx = pad.l + lv.pos * gw;
+            return <line key={lv.name} x1={lx} y1={pad.t} x2={lx} y2={pad.t + gh} stroke="#e5e7eb" strokeWidth="1" strokeDasharray="4,4" />;
+          })}
+          {/* Curve */}
+          <path d={pathD} fill="none" stroke="url(#sCurveGrad)" strokeWidth="3.5" strokeLinecap="round" />
+          <defs>
+            <linearGradient id="sCurveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#ef4444" />
+              <stop offset="25%" stopColor="#f97316" />
+              <stop offset="50%" stopColor="#eab308" />
+              <stop offset="75%" stopColor="#9333ea" />
+              <stop offset="100%" stopColor="#10b981" />
+            </linearGradient>
+          </defs>
+          {/* Level labels */}
+          {levels.map((lv) => {
+            const lx = pad.l + lv.pos * gw;
+            return (
+              <text key={lv.name + '-label'} x={lx} y={h - 6} textAnchor="middle" fontSize={compact ? 9 : 10} fontWeight="600" fill={lv.color}>{lv.name}</text>
+            );
+          })}
+          {/* Y axis label */}
+          <text x={12} y={h / 2} textAnchor="middle" fontSize="9" fill="#9ca3af" transform={`rotate(-90,12,${h/2})`}>CX Capability</text>
+          {/* User dot */}
+          <circle cx={ux} cy={uy} r="10" fill="#9333ea" fillOpacity="0.15" className="dot-pulse" />
+          <circle cx={ux} cy={uy} r="6" fill="#7e22ce" stroke="white" strokeWidth="2.5" />
+          {/* Score label */}
+          <rect x={ux - 22} y={uy - 28} width="44" height="20" rx="6" fill="#7e22ce" />
+          <text x={ux} y={uy - 15} textAnchor="middle" fontSize="11" fontWeight="700" fill="white">{score}%</text>
+          <polygon points={`${ux-4},${uy-9} ${ux+4},${uy-9} ${ux},${uy-4}`} fill="#7e22ce" />
+        </svg>
+      );
+    }
+
+    // ─── Gauge ───────────────────────────────────────────────────────
+    function Gauge({ score, size = 200 }) {
+      const radius = size * 0.4;
+      const circumference = 2 * Math.PI * radius;
+      const offset = circumference - (score / 100) * circumference;
+      const level = MATURITY_LEVELS.find(l => score >= l.min && score <= l.max) || MATURITY_LEVELS[0];
+      return (
+        <div className="flex flex-col items-center">
+          <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="drop-shadow-lg">
+            <circle cx={size/2} cy={size/2} r={radius} fill="none" stroke="#e5e7eb" strokeWidth="14" />
+            <circle cx={size/2} cy={size/2} r={radius} fill="none" stroke="url(#gaugeGrad)" strokeWidth="14" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={offset} className="gauge-fill" transform={`rotate(-90 ${size/2} ${size/2})`} />
+            <defs><linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stopColor="#9333ea" /><stop offset="100%" stopColor="#c084fc" /></linearGradient></defs>
+            <text x={size/2} y={size*0.46} textAnchor="middle" fill="#1f2937" fontSize={size*0.2} fontWeight="800">{score}</text>
+            <text x={size/2} y={size*0.575} textAnchor="middle" fill="#6b7280" fontSize={size*0.065} fontWeight="500">out of 100</text>
+          </svg>
+          <div className={`mt-3 px-4 py-1.5 rounded-full ${level.bg} ${level.border} border`}>
+            <span className={`text-base font-bold ${level.text}`}>{level.name}</span>
+          </div>
+        </div>
+      );
+    }
+
+    // ─── Landing Page ────────────────────────────────────────────────
+    function LandingPage({ onStart }) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-950 via-brand-900 to-brand-800 px-4">
+          <div className="max-w-2xl w-full text-center slide-up">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white/10 backdrop-blur mb-8">
+              <Icon name="Headphones" size={40} className="text-white" />
+            </div>
+            <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 leading-tight">Contact Center<br />CX Maturity Assessment</h1>
+            <p className="text-lg text-brand-200 mb-8 max-w-lg mx-auto leading-relaxed">Benchmark your customer experience operations against AI-native industry leaders. Get a personalized maturity score and actionable recommendations in under 5 minutes.</p>
+            <div className="flex flex-wrap justify-center gap-4 mb-10">
+              {SECTIONS.map((s) => (
+                <div key={s.id} className="flex items-center gap-2 bg-white/10 backdrop-blur rounded-full px-4 py-2 text-sm text-brand-100">
+                  <Icon name={s.icon} size={16} className="text-brand-300" />{s.title}
+                </div>
+              ))}
+            </div>
+            <button onClick={onStart} className="group inline-flex items-center gap-3 bg-white text-brand-900 font-semibold text-lg px-8 py-4 rounded-xl shadow-lg shadow-brand-900/30 hover:shadow-xl hover:shadow-brand-900/40 hover:bg-brand-50 transition-all duration-200">
+              Start Assessment <Icon name="ArrowRight" size={20} className="text-brand-700 group-hover:translate-x-1 transition-transform" />
+            </button>
+            <p className="text-brand-400 text-sm mt-6">25 questions &middot; ~5 minutes &middot; No sign-up required</p>
+          </div>
+        </div>
+      );
+    }
+
+    // ─── Question Page ───────────────────────────────────────────────
+    function QuestionPage({ section, question, questionIndex, totalQuestions, currentSectionIndex, localQIndex, selectedAnswer, onSelect, onNext, onBack }) {
+      return (
+        <div className="min-h-screen bg-gray-50">
+          <div className="bg-white border-b border-gray-100 sticky top-0 z-10">
+            <div className="max-w-3xl mx-auto px-4 py-4">
+              <ProgressBar current={questionIndex + 1} total={totalQuestions} sections={SECTIONS} currentSection={currentSectionIndex} />
+            </div>
+          </div>
+          <div className="max-w-3xl mx-auto px-4 py-8">
+            <div className="fade-in" key={question.id}>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-brand-100"><Icon name={section.icon} size={18} className="text-brand-700" /></div>
+                <span className="text-sm font-semibold text-brand-700 uppercase tracking-wider">{section.title}</span>
+                <span className="ml-auto text-sm font-medium text-gray-400">Question {localQIndex + 1} / {section.questions.length}</span>
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-8 leading-snug">{question.text}</h2>
+              <div className="space-y-3">
+                {question.options.map((opt, i) => {
+                  const isSelected = selectedAnswer === i;
+                  return (
+                    <button key={i} onClick={() => onSelect(i)} className={`option-card w-full text-left p-5 rounded-xl border-2 transition-all duration-200 ${isSelected ? 'border-brand-500 bg-brand-50 ring-2 ring-brand-200' : 'border-gray-200 bg-white hover:border-brand-300'}`}>
+                      <div className="flex items-start gap-4">
+                        <div className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center mt-0.5 transition-colors ${isSelected ? 'border-brand-600 bg-brand-600' : 'border-gray-300'}`}>{isSelected && <Icon name="Check" size={14} className="text-white" />}</div>
+                        <span className={`text-base leading-relaxed ${isSelected ? 'text-brand-900 font-medium' : 'text-gray-700'}`}>{opt.label}</span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="flex justify-between mt-10">
+                <button onClick={onBack} className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors ${questionIndex === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:text-brand-700 hover:bg-brand-50'}`} disabled={questionIndex === 0}><Icon name="ChevronLeft" size={16} /> Back</button>
+                <button onClick={onNext} disabled={selectedAnswer === null} className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${selectedAnswer !== null ? 'bg-brand-600 text-white hover:bg-brand-700 shadow-md shadow-brand-200' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}>
+                  {questionIndex === totalQuestions - 1 ? 'View Results' : 'Next'} <Icon name="ChevronRight" size={16} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    //  TEASER SUMMARY (Post-assessment, before gate)
+    // ═══════════════════════════════════════════════════════════════════
+    function TeaserSummary({ answers, onUnlock }) {
+      const { sectionScores, totalScore, level, sorted } = useMemo(() => computeScores(answers), [answers]);
+      const weakest = sorted[0];
+      const bridge = BRIDGE_LOGIC[weakest.id];
+      const bigWin = bridge ? bridge.headline : 'Significant improvements are within reach.';
+
+      const nextLevel = MATURITY_LEVELS.find(l => l.min > totalScore) || MATURITY_LEVELS[MATURITY_LEVELS.length - 1];
+
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-brand-50">
+          {/* Hero */}
+          <div className="bg-gradient-to-r from-brand-900 via-brand-800 to-brand-900 text-white">
+            <div className="max-w-5xl mx-auto px-4 py-14 text-center slide-up">
+              <h1 className="text-3xl md:text-4xl font-extrabold mb-2">Your CX Maturity Results</h1>
+              <p className="text-brand-200 text-lg">Here's how your contact center stacks up against AI-native leaders</p>
+            </div>
+          </div>
+
+          <div className="max-w-5xl mx-auto px-4 -mt-8">
+            {/* Score + S-Curve */}
+            <div className="bg-white rounded-2xl shadow-xl p-8 md:p-10 mb-6 slide-up">
+              <div className="grid md:grid-cols-2 gap-8 items-center">
+                <div className="flex justify-center"><Gauge score={totalScore} /></div>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Maturity Level: <span className={level.text}>{level.name}</span></h2>
+                  <p className="text-gray-600 leading-relaxed mb-4">{level.description}</p>
+                  {totalScore < 81 && (
+                    <div className="bg-brand-50 border border-brand-200 rounded-xl p-4">
+                      <p className="text-sm text-brand-800"><span className="font-bold">Next target:</span> Reach <span className="font-bold">{nextLevel.name}</span> level by addressing your {weakest.title} gap — currently at {weakest.pct}%.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="mt-8 pt-6 border-t border-gray-100">
+                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Your Position on the Maturity Curve</h3>
+                <SCurveMap score={totalScore} />
+              </div>
+            </div>
+
+            {/* Section Bars */}
+            <div className="bg-white rounded-2xl shadow-xl p-8 md:p-10 mb-6 fade-in">
+              <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2"><Icon name="BarChart3" size={22} className="text-brand-600" />Score Breakdown</h3>
+              <div className="space-y-5">
+                {sectionScores.map((s, i) => (
+                  <div key={s.id}>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2"><Icon name={s.icon} size={18} className="text-brand-600" /><span className="text-sm font-semibold text-gray-800">{s.title}</span></div>
+                      <span className="text-sm font-bold text-brand-700">{s.pct}%</span>
+                    </div>
+                    <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+                      <div className="bar-grow h-full rounded-full bg-gradient-to-r from-brand-500 to-brand-400" style={{ width: `${s.pct}%`, animationDelay: `${i * 0.15}s` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Big Win Teaser */}
+            <div className="bg-white rounded-2xl shadow-xl p-8 md:p-10 mb-6 fade-in">
+              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2"><Icon name="Lightbulb" size={22} className="text-yellow-500" />Your Biggest Opportunity</h3>
+              <div className="bg-gradient-to-r from-brand-50 to-purple-50 border border-brand-200 rounded-xl p-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <Icon name={bridge.icon} size={20} className="text-brand-600" />
+                  <span className="font-bold text-brand-800">{bridge.bridgeName}</span>
+                  <span className="ml-auto text-sm text-brand-600 font-semibold">{weakest.title}: {weakest.pct}%</span>
+                </div>
+                <p className="text-gray-700 leading-relaxed mb-3">{bigWin}</p>
+                <p className="text-sm text-gray-500 italic">Your full report includes a detailed gap analysis, action items, and a 90-day transformation roadmap...</p>
+              </div>
+            </div>
+
+            {/* Blurred Preview + Lead Gate CTA */}
+            <div className="relative mb-6 fade-in">
+              {/* Blurred preview */}
+              <div className="bg-white rounded-2xl shadow-xl p-8 md:p-10 filter blur-[6px] opacity-60 pointer-events-none select-none" aria-hidden="true">
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Detailed Gap Analysis & Action Items</h3>
+                <div className="space-y-4">
+                  {sorted.slice(0, 3).map(s => (
+                    <div key={s.id} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2"><span className="font-semibold">{s.title}</span></div>
+                      <p className="text-gray-500 text-sm">Detailed analysis of your {s.title.toLowerCase()} capabilities with specific recommendations for moving from {level.name} to the next maturity level. Includes ROI projections and prioritized action items.</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {/* Overlay CTA */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="bg-gradient-to-br from-brand-900 via-brand-800 to-brand-900 rounded-2xl shadow-2xl p-8 md:p-10 text-center max-w-lg mx-4">
+                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-white/10 mb-4">
+                    <Icon name="FileText" size={28} className="text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-2">Get Your Custom Transformation Roadmap</h3>
+                  <p className="text-brand-200 mb-6 text-sm leading-relaxed">Unlock a comprehensive 5-page report with detailed gap analysis, bridge strategies, ROI projections, and a 90-day action plan tailored to your results.</p>
+                  <button onClick={onUnlock} className="inline-flex items-center gap-2 bg-white text-brand-900 font-semibold px-8 py-3.5 rounded-xl hover:bg-brand-50 shadow-lg transition-all">
+                    <Icon name="Lock" size={18} /> Unlock Full Report
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="h-8" />
+          </div>
+        </div>
+      );
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    //  LEAD GATE FORM
+    // ═══════════════════════════════════════════════════════════════════
+    function LeadGateForm({ answers, onSubmit, onBack }) {
+      const [name, setName] = useState('');
+      const [email, setEmail] = useState('');
+      const [company, setCompany] = useState('');
+      const [submitting, setSubmitting] = useState(false);
+      const [error, setError] = useState('');
+      const { totalScore, level } = useMemo(() => computeScores(answers), [answers]);
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!name.trim() || !email.trim()) { setError('Please fill in your name and email.'); return; }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError('Please enter a valid email address.'); return; }
+        setSubmitting(true);
+        setError('');
+        try {
+          await fetch(WEBHOOK_URL, {
+            method: 'POST', mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name, email, company, totalScore, maturityLevel: level.name,
+              infrastructure: computeScores(answers).sectionScores[0].pct,
+              automation: computeScores(answers).sectionScores[1].pct,
+              coaching: computeScores(answers).sectionScores[2].pct,
+              wfm: computeScores(answers).sectionScores[3].pct,
+              aiInsights: computeScores(answers).sectionScores[4].pct,
+              timestamp: new Date().toISOString(),
+            }),
+          });
+        } catch (err) { /* non-blocking */ }
+        onSubmit({ name, email, company });
+      };
+
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-950 via-brand-900 to-brand-800 px-4">
+          <div className="max-w-md w-full slide-up">
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 backdrop-blur mb-4"><Icon name="FileText" size={32} className="text-white" /></div>
+              <h1 className="text-3xl font-extrabold text-white mb-2">Your Report Is Ready</h1>
+              <p className="text-brand-200">Enter your details below to download your personalized 5-page CX Transformation Roadmap.</p>
+            </div>
+            <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-2xl p-8 space-y-5">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Full Name *</label>
+                <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Jane Smith" className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition text-gray-800" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Work Email *</label>
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="jane@company.com" className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition text-gray-800" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Company <span className="text-gray-400 font-normal">(optional)</span></label>
+                <input type="text" value={company} onChange={e => setCompany(e.target.value)} placeholder="Acme Corp" className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition text-gray-800" />
+              </div>
+              {error && <p className="text-red-600 text-sm font-medium">{error}</p>}
+              <button type="submit" disabled={submitting} className="w-full flex items-center justify-center gap-2 bg-brand-600 text-white font-semibold py-3.5 rounded-xl hover:bg-brand-700 shadow-lg shadow-brand-200 transition-all disabled:opacity-60">
+                {submitting ? 'Generating...' : <><Icon name="Download" size={18} /> Download Full Report</>}
+              </button>
+              <button type="button" onClick={onBack} className="w-full text-center text-sm text-gray-500 hover:text-brand-700 transition-colors pt-1">Back to summary</button>
+            </form>
+          </div>
+        </div>
+      );
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    //  FULL REPORT (5 Pages)
+    // ═══════════════════════════════════════════════════════════════════
+    function FullReport({ answers, leadData, onRestart }) {
+      const { sectionScores, totalScore, level, sorted } = useMemo(() => computeScores(answers), [answers]);
+      const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      const weakSections = sorted.filter(s => s.pct < 75);
+      const strongSections = sorted.filter(s => s.pct >= 75);
+
+      // ── Report Header (reused) ──
+      const ReportHeader = ({ pageNum }) => (
+        <div className="flex items-center justify-between mb-8 pb-4 border-b-2 border-brand-600">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center"><Icon name="Headphones" size={16} className="text-white" /></div>
+            <span className="font-bold text-brand-900 text-sm">CX Maturity Assessment Report</span>
+          </div>
+          <span className="text-xs text-gray-400">Page {pageNum} of 5</span>
+        </div>
+      );
+
+      const ReportFooter = () => (
+        <div className="mt-auto pt-6 border-t border-gray-200 flex items-center justify-between text-xs text-gray-400">
+          <span>Prepared for {leadData.name} {leadData.company ? `at ${leadData.company}` : ''} &middot; {dateStr}</span>
+          <span>Confidential</span>
+        </div>
+      );
+
+      return (
+        <div className="min-h-screen bg-gray-100">
+          {/* Top Bar (no-print) */}
+          <div className="no-print bg-white border-b border-gray-200 sticky top-0 z-20">
+            <div className="max-w-[850px] mx-auto px-4 py-3 flex items-center justify-between">
+              <h1 className="text-lg font-bold text-gray-900 flex items-center gap-2"><Icon name="FileText" size={20} className="text-brand-600" />Your CX Transformation Report</h1>
+              <div className="flex gap-3">
+                <button onClick={() => window.print()} className="flex items-center gap-2 bg-brand-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-brand-700 text-sm transition-all"><Icon name="Printer" size={16} />Print / Save PDF</button>
+                <button onClick={onRestart} className="flex items-center gap-2 text-gray-600 hover:text-brand-700 px-4 py-2 rounded-lg text-sm border border-gray-200 hover:border-brand-300 transition-all"><Icon name="RotateCcw" size={16} />Retake</button>
+              </div>
+            </div>
+          </div>
+
+          <div className="max-w-[850px] mx-auto px-4 py-8 space-y-8">
+
+            {/* ════════════ PAGE 1: Executive Summary ════════════ */}
+            <div className="report-page bg-white rounded-2xl shadow-lg p-10 flex flex-col min-h-[1050px]">
+              <ReportHeader pageNum={1} />
+
+              {/* Title block */}
+              <div className="bg-gradient-to-r from-brand-900 via-brand-800 to-brand-900 rounded-xl p-8 text-white text-center mb-8">
+                <h2 className="text-3xl font-extrabold mb-1">CX Maturity Assessment</h2>
+                <h3 className="text-xl font-semibold text-brand-200 mb-1">Executive Summary</h3>
+                <p className="text-brand-300 text-sm">{dateStr} {leadData.company ? `| ${leadData.company}` : ''}</p>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-8 mb-8">
+                <div className="flex flex-col items-center">
+                  <Gauge score={totalScore} size={180} />
+                </div>
+                <div className="flex flex-col justify-center">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Overall Maturity: <span className={level.text}>{level.name}</span></h3>
+                  <p className="text-gray-600 text-sm leading-relaxed mb-4">{level.description}</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                      <div className="text-lg font-bold text-green-700">{sorted[sorted.length - 1].pct}%</div>
+                      <div className="text-xs text-green-600 font-medium">Strongest: {sorted[sorted.length - 1].title}</div>
+                    </div>
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
+                      <div className="text-lg font-bold text-red-700">{sorted[0].pct}%</div>
+                      <div className="text-xs text-red-600 font-medium">Weakest: {sorted[0].title}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Maturity Curve Position</h4>
+                <SCurveMap score={totalScore} compact={true} />
+              </div>
+
+              <div className="bg-gray-50 rounded-xl p-5 mb-6">
+                <h4 className="font-bold text-gray-900 mb-3">Section Overview</h4>
+                <div className="space-y-3">
+                  {sectionScores.map(s => (
+                    <div key={s.id} className="flex items-center gap-3">
+                      <Icon name={s.icon} size={16} className="text-brand-600" />
+                      <span className="text-sm font-medium text-gray-700 w-40">{s.title}</span>
+                      <div className="flex-1 h-2.5 bg-gray-200 rounded-full overflow-hidden"><div className="h-full rounded-full bg-gradient-to-r from-brand-500 to-brand-400" style={{ width: `${s.pct}%` }} /></div>
+                      <span className="text-sm font-bold text-brand-700 w-12 text-right">{s.pct}%</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <ReportFooter />
+            </div>
+
+            {/* ════════════ PAGE 2: Section Deep-Dive ════════════ */}
+            <div className="report-page bg-white rounded-2xl shadow-lg p-10 flex flex-col min-h-[1050px]">
+              <ReportHeader pageNum={2} />
+
+              <h2 className="text-2xl font-extrabold text-gray-900 mb-1">Detailed Section Analysis</h2>
+              <p className="text-gray-500 text-sm mb-6">Question-by-question breakdown of your assessment results across all five dimensions.</p>
+
+              <div className="space-y-6 flex-1">
+                {sectionScores.map((sec) => (
+                  <div key={sec.id} className="border border-gray-200 rounded-xl overflow-hidden">
+                    <div className={`flex items-center justify-between px-5 py-3 ${sec.pct >= 75 ? 'bg-green-50' : sec.pct >= 50 ? 'bg-yellow-50' : sec.pct >= 25 ? 'bg-orange-50' : 'bg-red-50'}`}>
+                      <div className="flex items-center gap-2">
+                        <Icon name={sec.icon} size={18} className="text-brand-700" />
+                        <span className="font-bold text-gray-900">{sec.title}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-24 h-2 bg-white/60 rounded-full overflow-hidden"><div className="h-full rounded-full bg-brand-600" style={{ width: `${sec.pct}%` }} /></div>
+                        <span className="font-bold text-brand-700 text-sm">{sec.pct}%</span>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-white font-semibold text-gray-600">Gap: {100 - sec.pct}pts</span>
+                      </div>
+                    </div>
+                    <div className="px-5 py-3">
+                      {sec.questionScores.map((qs, qi) => (
+                        <div key={qi} className={`flex items-start gap-3 py-2 ${qi > 0 ? 'border-t border-gray-100' : ''}`}>
+                          <div className="flex-shrink-0 mt-0.5">
+                            {qs.score >= 3 ? <Icon name="CheckCircle" size={15} className="text-green-500" /> : qs.score >= 1 ? <Icon name="AlertCircle" size={15} className="text-yellow-500" /> : <Icon name="XCircle" size={15} className="text-red-400" />}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs text-gray-500 leading-snug truncate">{qs.question}</p>
+                            <p className="text-xs text-gray-700 font-medium mt-0.5 leading-snug">{qs.answerLabel.length > 120 ? qs.answerLabel.substring(0, 120) + '...' : qs.answerLabel}</p>
+                          </div>
+                          <span className={`flex-shrink-0 text-xs font-bold px-2 py-0.5 rounded ${qs.score >= 3 ? 'bg-green-100 text-green-700' : qs.score >= 1 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>{qs.score}/{qs.maxScore}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <ReportFooter />
+            </div>
+
+            {/* ════════════ PAGE 3: Bridge Strategies (Top 2-3) ════════════ */}
+            <div className="report-page bg-white rounded-2xl shadow-lg p-10 flex flex-col min-h-[1050px]">
+              <ReportHeader pageNum={3} />
+
+              <h2 className="text-2xl font-extrabold text-gray-900 mb-1">Transformation Strategies</h2>
+              <p className="text-gray-500 text-sm mb-6">Focused analysis of your highest-impact improvement areas with specific bridge strategies to close the gap.</p>
+
+              {sorted.slice(0, 2).map((sec) => {
+                const bl = BRIDGE_LOGIC[sec.id];
+                if (!bl) return null;
+                return (
+                  <div key={sec.id} className="mb-8 last:mb-0">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-xl bg-brand-100 flex items-center justify-center"><Icon name={bl.icon} size={22} className="text-brand-700" /></div>
+                      <div>
+                        <h3 className="font-extrabold text-gray-900 text-lg leading-tight">{bl.bridgeName}</h3>
+                        <span className="text-xs text-brand-600 font-semibold">{sec.title} — Current Score: {sec.pct}%</span>
+                      </div>
+                    </div>
+
+                    <p className="text-gray-800 font-semibold mb-2">{bl.headline}</p>
+                    <p className="text-sm text-gray-600 leading-relaxed mb-4">{bl.situation}</p>
+
+                    <div className="bg-brand-50 border-l-4 border-brand-600 rounded-r-lg p-4 mb-4">
+                      <h4 className="text-sm font-bold text-brand-900 mb-1">Industry Insight</h4>
+                      <p className="text-sm text-brand-800 leading-relaxed">{bl.insight}</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 mb-4">
+                      {bl.keyMetrics.map((m, i) => (
+                        <div key={i} className="flex items-start gap-2 bg-gray-50 rounded-lg p-3">
+                          <Icon name="TrendingUp" size={14} className="text-brand-600 mt-0.5 flex-shrink-0" />
+                          <span className="text-xs text-gray-700 font-medium leading-snug">{m}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <h4 className="font-bold text-gray-900 text-sm mb-2 flex items-center gap-1"><Icon name="ListChecks" size={16} className="text-brand-600" />Priority Action Items</h4>
+                    <ul className="space-y-1.5 mb-4">
+                      {bl.actions.map((a, i) => (
+                        <li key={i} className="flex items-start gap-2 text-sm text-gray-600"><span className="flex-shrink-0 w-5 h-5 rounded-full bg-brand-100 text-brand-700 text-xs font-bold flex items-center justify-center mt-0.5">{i + 1}</span><span className="leading-snug">{a}</span></li>
+                      ))}
+                    </ul>
+
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+                      <h4 className="text-sm font-bold text-emerald-800 mb-1 flex items-center gap-1"><Icon name="DollarSign" size={14} className="text-emerald-600" />Business Value</h4>
+                      <p className="text-sm text-emerald-700 leading-relaxed">{bl.businessValue}</p>
+                    </div>
+                  </div>
+                );
+              })}
+
+              <ReportFooter />
+            </div>
+
+            {/* ════════════ PAGE 4: Remaining Bridges + Quick Wins ════════════ */}
+            <div className="report-page bg-white rounded-2xl shadow-lg p-10 flex flex-col min-h-[1050px]">
+              <ReportHeader pageNum={4} />
+
+              <h2 className="text-2xl font-extrabold text-gray-900 mb-1">Additional Opportunities & Quick Wins</h2>
+              <p className="text-gray-500 text-sm mb-6">Continued analysis of remaining improvement areas and strategies to maintain your strengths.</p>
+
+              {/* Remaining weak sections */}
+              {sorted.slice(2).map((sec) => {
+                const bl = BRIDGE_LOGIC[sec.id];
+                if (!bl) return null;
+                const isStrong = sec.pct >= 75;
+                return (
+                  <div key={sec.id} className="mb-6 last:mb-0">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${isStrong ? 'bg-green-100' : 'bg-brand-100'}`}><Icon name={bl.icon} size={18} className={isStrong ? 'text-green-700' : 'text-brand-700'} /></div>
+                      <div>
+                        <h3 className="font-bold text-gray-900">{isStrong ? `Maintain: ${sec.title}` : bl.bridgeName}</h3>
+                        <span className={`text-xs font-semibold ${isStrong ? 'text-green-600' : 'text-brand-600'}`}>{sec.title} — {sec.pct}%</span>
+                      </div>
+                    </div>
+
+                    {!isStrong && (
+                      <>
+                        <p className="text-sm text-gray-600 leading-relaxed mb-3">{bl.insight}</p>
+                        <div className="bg-brand-50 border-l-4 border-brand-500 rounded-r-lg p-3 mb-3">
+                          <p className="text-sm text-brand-800 font-medium">{bl.dialpadFit}</p>
+                        </div>
+                      </>
+                    )}
+
+                    <h4 className="font-bold text-gray-900 text-sm mb-2">{isStrong ? 'Continue Optimizing' : 'Key Actions'}</h4>
+                    <ul className="space-y-1.5">
+                      {(SECTION_RECS[sec.id] || []).slice(0, isStrong ? 2 : 4).map((rec, j) => (
+                        <li key={j} className="flex items-start gap-2 text-sm text-gray-600">
+                          <Icon name={isStrong ? 'Check' : 'ChevronRight'} size={14} className={`${isStrong ? 'text-green-500' : 'text-brand-500'} mt-0.5 flex-shrink-0`} />
+                          <span className="leading-snug">{rec}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
+
+              {/* Quick Wins box */}
+              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mt-6">
+                <h4 className="font-bold text-yellow-900 mb-3 flex items-center gap-2"><Icon name="Zap" size={18} className="text-yellow-600" />Quick Wins: Immediate Impact Actions</h4>
+                <div className="grid md:grid-cols-2 gap-3">
+                  {[
+                    { icon: 'MessageSquare', text: 'Deploy Ai Recaps to cut after-call work by 50% within the first week' },
+                    { icon: 'Shield', text: 'Enable Ai Scorecards on a pilot team to benchmark quality across 100% of their calls' },
+                    { icon: 'Bot', text: 'Launch an Ai Chatbot for your top FAQ topic to validate deflection potential' },
+                    { icon: 'BarChart3', text: 'Activate real-time sentiment analysis to catch at-risk conversations live' },
+                  ].map((qw, i) => (
+                    <div key={i} className="flex items-start gap-2 bg-white rounded-lg p-3 border border-yellow-100">
+                      <Icon name={qw.icon} size={16} className="text-yellow-700 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-gray-700 leading-snug">{qw.text}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <ReportFooter />
+            </div>
+
+            {/* ════════════ PAGE 5: 90-Day Roadmap + CTA ════════════ */}
+            <div className="report-page bg-white rounded-2xl shadow-lg p-10 flex flex-col min-h-[1050px]">
+              <ReportHeader pageNum={5} />
+
+              <h2 className="text-2xl font-extrabold text-gray-900 mb-1">90-Day Transformation Roadmap</h2>
+              <p className="text-gray-500 text-sm mb-8">A phased approach to move from <span className="font-bold">{level.name}</span> to the next maturity level, prioritized by impact.</p>
+
+              {/* Timeline */}
+              {[
+                { phase: 'Phase 1', period: 'Days 1–30', title: 'Foundation', color: 'brand', bgColor: 'bg-brand-50', borderColor: 'border-brand-200', textColor: 'text-brand-700', section: sorted[0], description: `Focus on your biggest gap: ${sorted[0].title} (${sorted[0].pct}%). Establish the foundational capabilities needed to close this critical gap.`, actions: (BRIDGE_LOGIC[sorted[0].id]?.actions || []).slice(0, 3) },
+                { phase: 'Phase 2', period: 'Days 31–60', title: 'Acceleration', color: 'purple', bgColor: 'bg-purple-50', borderColor: 'border-purple-200', textColor: 'text-purple-700', section: sorted[1], description: `Address your second priority: ${sorted[1].title} (${sorted[1].pct}%). Build on Phase 1 momentum to accelerate capability development.`, actions: (BRIDGE_LOGIC[sorted[1].id]?.actions || []).slice(0, 3) },
+                { phase: 'Phase 3', period: 'Days 61–90', title: 'Optimization', color: 'emerald', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-200', textColor: 'text-emerald-700', section: sorted[2], description: `Consolidate remaining areas starting with ${sorted[2].title} (${sorted[2].pct}%). Optimize across all dimensions and establish continuous improvement processes.`, actions: (BRIDGE_LOGIC[sorted[2].id]?.actions || []).slice(0, 3) },
+              ].map((ph, idx) => (
+                <div key={idx} className="flex gap-4 mb-6">
+                  {/* Timeline connector */}
+                  <div className="flex flex-col items-center">
+                    <div className={`w-10 h-10 rounded-full ${ph.bgColor} ${ph.borderColor} border-2 flex items-center justify-center font-bold ${ph.textColor} text-sm`}>{idx + 1}</div>
+                    {idx < 2 && <div className="w-0.5 flex-1 bg-gray-200 mt-1" />}
+                  </div>
+                  {/* Content */}
+                  <div className={`flex-1 ${ph.bgColor} ${ph.borderColor} border rounded-xl p-5 mb-1`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className={`font-extrabold ${ph.textColor}`}>{ph.phase}: {ph.title}</h3>
+                      <span className={`text-xs font-semibold ${ph.textColor} bg-white px-2.5 py-1 rounded-full`}>{ph.period}</span>
+                    </div>
+                    <p className="text-sm text-gray-600 leading-relaxed mb-3">{ph.description}</p>
+                    <div className="space-y-1.5">
+                      {ph.actions.map((a, i) => (
+                        <div key={i} className="flex items-start gap-2"><Icon name="CheckSquare" size={14} className={`${ph.textColor} mt-0.5 flex-shrink-0`} /><span className="text-sm text-gray-700 leading-snug">{a}</span></div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Expected outcomes */}
+              <div className="bg-gray-50 rounded-xl p-6 mb-6">
+                <h4 className="font-bold text-gray-900 mb-3">Expected Outcomes After 90 Days</h4>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {[
+                    { metric: '50%', label: 'Reduction in wrap-up time' },
+                    { metric: '62%+', label: 'Ai Agent deflection rate' },
+                    { metric: '91%', label: 'CSAT coverage via Ai' },
+                    { metric: '30hrs', label: 'Saved per agent/month' },
+                  ].map((o, i) => (
+                    <div key={i} className="text-center bg-white rounded-lg p-3 border border-gray-200">
+                      <div className="text-xl font-extrabold text-brand-700">{o.metric}</div>
+                      <div className="text-xs text-gray-500 mt-1">{o.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Dialpad CTA */}
+              <div className="bg-gradient-to-r from-brand-900 via-brand-800 to-brand-900 rounded-xl p-8 text-center">
+                <h3 className="text-2xl font-bold text-white mb-2">Ready to Start Your Transformation?</h3>
+                <p className="text-brand-200 mb-5 max-w-xl mx-auto text-sm leading-relaxed">Dialpad's AI-native platform — powered by DialpadGPT — delivers the unified, intelligent CX infrastructure your organization needs to reach Visionary status.</p>
+                <a href="https://www.dialpad.com" target="_blank" rel="noopener noreferrer" className="no-print inline-flex items-center gap-2 bg-white text-brand-900 font-semibold px-8 py-3 rounded-xl hover:bg-brand-50 shadow-lg transition-all text-sm">
+                  Explore Dialpad <Icon name="ExternalLink" size={16} />
+                </a>
+              </div>
+
+              <ReportFooter />
+            </div>
+
+          </div>
+
+          {/* Bottom bar (no-print) */}
+          <div className="no-print bg-white border-t border-gray-200 py-6 text-center">
+            <button onClick={() => window.print()} className="inline-flex items-center gap-2 bg-brand-600 text-white font-semibold px-8 py-3 rounded-xl hover:bg-brand-700 shadow-lg shadow-brand-200 transition-all mr-4"><Icon name="Printer" size={18} />Print / Save as PDF</button>
+            <button onClick={onRestart} className="inline-flex items-center gap-2 text-gray-600 hover:text-brand-700 px-6 py-3 rounded-xl border border-gray-200 hover:border-brand-300 transition-all"><Icon name="RotateCcw" size={18} />Retake Assessment</button>
+          </div>
+        </div>
+      );
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    //  APP
+    // ═══════════════════════════════════════════════════════════════════
+    function App() {
+      const [screen, setScreen] = useState('landing');
+      const totalQuestions = SECTIONS.reduce((a, s) => a + s.questions.length, 0);
+      const [answers, setAnswers] = useState(Array(totalQuestions).fill(null));
+      const [currentQ, setCurrentQ] = useState(0);
+      const [leadData, setLeadData] = useState({ name: '', email: '', company: '' });
+
+      const { section, question, sectionIndex, localQIndex } = useMemo(() => {
+        let count = 0;
+        for (let si = 0; si < SECTIONS.length; si++) {
+          for (let qi = 0; qi < SECTIONS[si].questions.length; qi++) {
+            if (count === currentQ) return { section: SECTIONS[si], question: SECTIONS[si].questions[qi], sectionIndex: si, localQIndex: qi };
+            count++;
+          }
+        }
+        return { section: SECTIONS[0], question: SECTIONS[0].questions[0], sectionIndex: 0, localQIndex: 0 };
+      }, [currentQ]);
+
+      const handleSelect = useCallback((optIdx) => {
+        setAnswers(prev => { const n = [...prev]; n[currentQ] = optIdx; return n; });
+      }, [currentQ]);
+
+      const handleNext = useCallback(() => {
+        if (currentQ === totalQuestions - 1) setScreen('teaser');
+        else setCurrentQ(q => q + 1);
+      }, [currentQ, totalQuestions]);
+
+      const handleBack = useCallback(() => {
+        if (currentQ > 0) setCurrentQ(q => q - 1);
+      }, [currentQ]);
+
+      const handleRestart = useCallback(() => {
+        setAnswers(Array(totalQuestions).fill(null));
+        setCurrentQ(0);
+        setLeadData({ name: '', email: '', company: '' });
+        setScreen('landing');
+      }, [totalQuestions]);
+
+      if (screen === 'landing') return <LandingPage onStart={() => setScreen('assessment')} />;
+      if (screen === 'teaser') return <TeaserSummary answers={answers} onUnlock={() => setScreen('leadgate')} />;
+      if (screen === 'leadgate') return <LeadGateForm answers={answers} onSubmit={(data) => { setLeadData(data); setScreen('report'); }} onBack={() => setScreen('teaser')} />;
+      if (screen === 'report') return <FullReport answers={answers} leadData={leadData} onRestart={handleRestart} />;
+
+      return (
+        <QuestionPage
+          section={section} question={question} questionIndex={currentQ} totalQuestions={totalQuestions}
+          currentSectionIndex={sectionIndex} localQIndex={localQIndex} selectedAnswer={answers[currentQ]}
+          onSelect={handleSelect} onNext={handleNext} onBack={handleBack}
+        />
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
