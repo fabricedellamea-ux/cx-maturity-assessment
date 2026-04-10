@@ -14,19 +14,69 @@
       theme: {
         extend: {
           colors: {
-            brand: {
-              50: '#faf5ff',
-              100: '#f3e8ff',
-              200: '#e9d5ff',
-              300: '#d8b4fe',
-              400: '#c084fc',
-              500: '#a855f7',
-              600: '#9333ea',
-              700: '#7e22ce',
-              800: '#6b21a8',
-              900: '#581c87',
-              950: '#3b0764',
+            primary: {
+              50: '#f0f4ff',
+              100: '#e0e8ff',
+              200: '#c7d9ff',
+              300: '#a4c5ff',
+              400: '#81a9ff',
+              500: '#4f46e5',  // Dialpad brand blue
+              600: '#4338ca',
+              700: '#3730a3',
+              800: '#2e2683',
+              900: '#1e1b4b',
+            },
+            success: {
+              50: '#f0fdf4',
+              600: '#16a34a',
+              700: '#15803d',
+            },
+            warning: {
+              50: '#fef3c7',
+              600: '#ea580c',
+              700: '#c2410c',
+            },
+            error: {
+              50: '#fef2f2',
+              600: '#dc2626',
+              700: '#b91c1c',
+            },
+            neutral: {
+              50: '#f9fafb',
+              100: '#f3f4f6',
+              200: '#e5e7eb',
+              600: '#4b5563',
+              700: '#374151',
+              900: '#111827',
             }
+          },
+          spacing: {
+            xs: '0.25rem',   // 4px
+            sm: '0.5rem',    // 8px
+            md: '1rem',      // 16px
+            lg: '1.5rem',    // 24px
+            xl: '2rem',      // 32px
+          },
+          borderRadius: {
+            sm: '0.25rem',   // 4px
+            md: '0.5rem',    // 8px
+            lg: '0.75rem',   // 12px
+          },
+          fontSize: {
+            h1: ['32px', { lineHeight: '1.25', fontWeight: '700' }],
+            h2: ['24px', { lineHeight: '1.33', fontWeight: '700' }],
+            h3: ['18px', { lineHeight: '1.33', fontWeight: '600' }],
+            body: ['16px', { lineHeight: '1.5', fontWeight: '400' }],
+            sm: ['14px', { lineHeight: '1.57', fontWeight: '400' }],
+            xs: ['12px', { lineHeight: '1.67', fontWeight: '400' }],
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          boxShadow: {
+            sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+            md: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+            lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
           }
         }
       }
@@ -45,7 +95,7 @@
     .bar-grow { animation: barGrow 1s ease-out forwards; }
     @keyframes barGrow { from { width: 0; } }
     .option-card { transition: all 0.2s ease; }
-    .option-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px -5px rgba(124, 58, 237, 0.15); }
+    .option-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px -5px rgba(79, 70, 229, 0.15); }
     .gauge-fill { transition: stroke-dashoffset 1.5s ease-out; }
     .dot-pulse { animation: dotPulse 2s ease-in-out infinite; }
     @keyframes dotPulse { 0%,100% { r: 8; opacity:1; } 50% { r: 11; opacity:0.7; } }
@@ -359,7 +409,7 @@
       { name: 'Reactive', min: 0, max: 20, color: 'from-red-500 to-red-600', bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700', barColor: '#ef4444', description: 'Your contact center is operating in a reactive, legacy mode. Significant modernization is needed across all dimensions to meet current customer expectations.' },
       { name: 'Emerging', min: 21, max: 40, color: 'from-orange-500 to-orange-600', bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-700', barColor: '#f97316', description: 'You\'ve started your modernization journey but still rely heavily on manual processes and fragmented tools. Consolidating onto a truly unified platform with built-in AI would eliminate integration overhead and unlock immediate efficiency gains.' },
       { name: 'Scaling', min: 41, max: 60, color: 'from-yellow-500 to-yellow-600', bg: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-700', barColor: '#eab308', description: 'Your contact center has solid foundations with room to grow. To reach the next level, prioritize AI-powered automation, 100% quality monitoring coverage, and AI-inferred customer satisfaction analysis to close your remaining gaps.' },
-      { name: 'Optimizing', min: 61, max: 80, color: 'from-brand-500 to-brand-600', bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-700', barColor: '#9333ea', description: 'You\'re operating at a high level with strong technology adoption. To reach Visionary status, focus on purpose-built AI deeply embedded across your platform, no-code automation tooling, and unified AI governance.' },
+      { name: 'Optimizing', min: 61, max: 80, color: 'from-primary-500 to-primary-600', bg: 'bg-primary-50', border: 'border-primary-200', text: 'text-primary-700', barColor: '#4338ca', description: 'You\'re operating at a high level with strong technology adoption. To reach Visionary status, focus on purpose-built AI deeply embedded across your platform, no-code automation tooling, and unified AI governance.' },
       { name: 'Visionary', min: 81, max: 100, color: 'from-emerald-500 to-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700', barColor: '#10b981', description: 'Congratulations — your contact center is best-in-class. You\'re leveraging purpose-built AI, autonomous virtual agents, real-time coaching, and unified governance. Continue innovating and measuring impact across every customer interaction.' },
     ];
 
@@ -539,16 +589,16 @@
         <div className="w-full mb-8">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-medium text-gray-500">Question {current} of {total}</span>
-            <span className="text-sm font-semibold text-brand-700">{pct}% Complete</span>
+            <span className="text-sm font-semibold text-primary-700">{pct}% Complete</span>
           </div>
           <div className="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
-            <div className="progress-fill h-full bg-gradient-to-r from-brand-500 to-brand-600 rounded-full" style={{ width: `${pct}%` }} />
+            <div className="progress-fill h-full bg-gradient-to-r from-primary-500 to-primary-600 rounded-full" style={{ width: `${pct}%` }} />
           </div>
           <div className="flex mt-4 gap-1">
             {sections.map((s, i) => (
               <div key={s.id} className="flex-1 flex flex-col items-center">
-                <div className={`w-full h-1.5 rounded-full transition-colors duration-300 ${i < currentSection ? 'bg-brand-600' : i === currentSection ? 'bg-brand-400' : 'bg-gray-200'}`} />
-                <span className={`text-[10px] mt-1.5 font-medium transition-colors ${i <= currentSection ? 'text-brand-700' : 'text-gray-400'}`}>{s.title}</span>
+                <div className={`w-full h-1.5 rounded-full transition-colors duration-300 ${i < currentSection ? 'bg-primary-600' : i === currentSection ? 'bg-primary-400' : 'bg-gray-200'}`} />
+                <span className={`text-[10px] mt-1.5 font-medium transition-colors ${i <= currentSection ? 'text-primary-700' : 'text-gray-400'}`}>{s.title}</span>
               </div>
             ))}
           </div>
@@ -650,24 +700,24 @@
     // ─── Landing Page ────────────────────────────────────────────────
     function LandingPage({ onStart }) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-950 via-brand-900 to-brand-800 px-4">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-950 via-primary-900 to-primary-800 px-4">
           <div className="max-w-2xl w-full text-center slide-up">
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white/10 backdrop-blur mb-8">
               <Icon name="Headphones" size={40} className="text-white" />
             </div>
             <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 leading-tight">Contact Center<br />CX Maturity Assessment</h1>
-            <p className="text-lg text-brand-200 mb-8 max-w-lg mx-auto leading-relaxed">Benchmark your customer experience operations against AI-native industry leaders. Get a personalized maturity score and actionable recommendations in under 5 minutes.</p>
+            <p className="text-lg text-primary-200 mb-8 max-w-lg mx-auto leading-relaxed">Benchmark your customer experience operations against AI-native industry leaders. Get a personalized maturity score and actionable recommendations in under 5 minutes.</p>
             <div className="flex flex-wrap justify-center gap-4 mb-10">
               {SECTIONS.map((s) => (
-                <div key={s.id} className="flex items-center gap-2 bg-white/10 backdrop-blur rounded-full px-4 py-2 text-sm text-brand-100">
-                  <Icon name={s.icon} size={16} className="text-brand-300" />{s.title}
+                <div key={s.id} className="flex items-center gap-2 bg-white/10 backdrop-blur rounded-full px-4 py-2 text-sm text-primary-100">
+                  <Icon name={s.icon} size={16} className="text-primary-300" />{s.title}
                 </div>
               ))}
             </div>
-            <button onClick={onStart} className="group inline-flex items-center gap-3 bg-white text-brand-900 font-semibold text-lg px-8 py-4 rounded-xl shadow-lg shadow-brand-900/30 hover:shadow-xl hover:shadow-brand-900/40 hover:bg-brand-50 transition-all duration-200">
-              Start Assessment <Icon name="ArrowRight" size={20} className="text-brand-700 group-hover:translate-x-1 transition-transform" />
+            <button onClick={onStart} className="group inline-flex items-center gap-3 bg-white text-primary-900 font-semibold text-lg px-8 py-4 rounded-xl shadow-lg shadow-primary-900/30 hover:shadow-xl hover:shadow-primary-900/40 hover:bg-primary-50 transition-all duration-200">
+              Start Assessment <Icon name="ArrowRight" size={20} className="text-primary-700 group-hover:translate-x-1 transition-transform" />
             </button>
-            <p className="text-brand-400 text-sm mt-6">25 questions &middot; ~5 minutes &middot; No sign-up required</p>
+            <p className="text-primary-400 text-sm mt-6">25 questions &middot; ~5 minutes &middot; No sign-up required</p>
           </div>
         </div>
       );
@@ -685,8 +735,8 @@
           <div className="max-w-3xl mx-auto px-4 py-8">
             <div className="fade-in" key={question.id}>
               <div className="flex items-center gap-3 mb-2">
-                <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-brand-100"><Icon name={section.icon} size={18} className="text-brand-700" /></div>
-                <span className="text-sm font-semibold text-brand-700 uppercase tracking-wider">{section.title}</span>
+                <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary-100"><Icon name={section.icon} size={18} className="text-primary-700" /></div>
+                <span className="text-sm font-semibold text-primary-700 uppercase tracking-wider">{section.title}</span>
                 <span className="ml-auto text-sm font-medium text-gray-400">Question {localQIndex + 1} / {section.questions.length}</span>
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-8 leading-snug">{question.text}</h2>
@@ -694,18 +744,18 @@
                 {question.options.map((opt, i) => {
                   const isSelected = selectedAnswer === i;
                   return (
-                    <button key={i} onClick={() => onSelect(i)} className={`option-card w-full text-left p-5 rounded-xl border-2 transition-all duration-200 ${isSelected ? 'border-brand-500 bg-brand-50 ring-2 ring-brand-200' : 'border-gray-200 bg-white hover:border-brand-300'}`}>
+                    <button key={i} onClick={() => onSelect(i)} className={`option-card w-full text-left p-5 rounded-xl border-2 transition-all duration-200 ${isSelected ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-200' : 'border-gray-200 bg-white hover:border-primary-300'}`}>
                       <div className="flex items-start gap-4">
-                        <div className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center mt-0.5 transition-colors ${isSelected ? 'border-brand-600 bg-brand-600' : 'border-gray-300'}`}>{isSelected && <Icon name="Check" size={14} className="text-white" />}</div>
-                        <span className={`text-base leading-relaxed ${isSelected ? 'text-brand-900 font-medium' : 'text-gray-700'}`}>{opt.label}</span>
+                        <div className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center mt-0.5 transition-colors ${isSelected ? 'border-primary-600 bg-primary-600' : 'border-gray-300'}`}>{isSelected && <Icon name="Check" size={14} className="text-white" />}</div>
+                        <span className={`text-base leading-relaxed ${isSelected ? 'text-primary-900 font-medium' : 'text-gray-700'}`}>{opt.label}</span>
                       </div>
                     </button>
                   );
                 })}
               </div>
               <div className="flex justify-between mt-10">
-                <button onClick={onBack} className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors ${questionIndex === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:text-brand-700 hover:bg-brand-50'}`} disabled={questionIndex === 0}><Icon name="ChevronLeft" size={16} /> Back</button>
-                <button onClick={onNext} disabled={selectedAnswer === null} className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${selectedAnswer !== null ? 'bg-brand-600 text-white hover:bg-brand-700 shadow-md shadow-brand-200' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}>
+                <button onClick={onBack} className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors ${questionIndex === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:text-primary-700 hover:bg-primary-50'}`} disabled={questionIndex === 0}><Icon name="ChevronLeft" size={16} /> Back</button>
+                <button onClick={onNext} disabled={selectedAnswer === null} className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${selectedAnswer !== null ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-md shadow-primary-200' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}>
                   {questionIndex === totalQuestions - 1 ? 'View Results' : 'Next'} <Icon name="ChevronRight" size={16} />
                 </button>
               </div>
@@ -727,12 +777,12 @@
       const nextLevel = MATURITY_LEVELS.find(l => l.min > totalScore) || MATURITY_LEVELS[MATURITY_LEVELS.length - 1];
 
       return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-brand-50">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-primary-50">
           {/* Hero */}
-          <div className="bg-gradient-to-r from-brand-900 via-brand-800 to-brand-900 text-white">
+          <div className="bg-gradient-to-r from-primary-900 via-primary-800 to-primary-900 text-white">
             <div className="max-w-5xl mx-auto px-4 py-14 text-center slide-up">
               <h1 className="text-3xl md:text-4xl font-extrabold mb-2">Your CX Maturity Results</h1>
-              <p className="text-brand-200 text-lg">Here's how your contact center stacks up against AI-native leaders</p>
+              <p className="text-primary-200 text-lg">Here's how your contact center stacks up against AI-native leaders</p>
             </div>
           </div>
 
@@ -745,8 +795,8 @@
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">Maturity Level: <span className={level.text}>{level.name}</span></h2>
                   <p className="text-gray-600 leading-relaxed mb-4">{level.description}</p>
                   {totalScore < 81 && (
-                    <div className="bg-brand-50 border border-brand-200 rounded-xl p-4">
-                      <p className="text-sm text-brand-800"><span className="font-bold">Next target:</span> Reach <span className="font-bold">{nextLevel.name}</span> level by addressing your {weakest.title} gap — currently at {weakest.pct}%.</p>
+                    <div className="bg-primary-50 border border-primary-200 rounded-xl p-4">
+                      <p className="text-sm text-primary-800"><span className="font-bold">Next target:</span> Reach <span className="font-bold">{nextLevel.name}</span> level by addressing your {weakest.title} gap — currently at {weakest.pct}%.</p>
                     </div>
                   )}
                 </div>
@@ -759,16 +809,16 @@
 
             {/* Section Bars */}
             <div className="bg-white rounded-2xl shadow-xl p-8 md:p-10 mb-6 fade-in">
-              <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2"><Icon name="BarChart3" size={22} className="text-brand-600" />Score Breakdown</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2"><Icon name="BarChart3" size={22} className="text-primary-600" />Score Breakdown</h3>
               <div className="space-y-5">
                 {sectionScores.map((s, i) => (
                   <div key={s.id}>
                     <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2"><Icon name={s.icon} size={18} className="text-brand-600" /><span className="text-sm font-semibold text-gray-800">{s.title}</span></div>
-                      <span className="text-sm font-bold text-brand-700">{s.pct}%</span>
+                      <div className="flex items-center gap-2"><Icon name={s.icon} size={18} className="text-primary-600" /><span className="text-sm font-semibold text-gray-800">{s.title}</span></div>
+                      <span className="text-sm font-bold text-primary-700">{s.pct}%</span>
                     </div>
                     <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="bar-grow h-full rounded-full bg-gradient-to-r from-brand-500 to-brand-400" style={{ width: `${s.pct}%`, animationDelay: `${i * 0.15}s` }} />
+                      <div className="bar-grow h-full rounded-full bg-gradient-to-r from-primary-500 to-primary-400" style={{ width: `${s.pct}%`, animationDelay: `${i * 0.15}s` }} />
                     </div>
                   </div>
                 ))}
@@ -778,11 +828,11 @@
             {/* Big Win Teaser */}
             <div className="bg-white rounded-2xl shadow-xl p-8 md:p-10 mb-6 fade-in">
               <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2"><Icon name="Lightbulb" size={22} className="text-yellow-500" />Your Biggest Opportunity</h3>
-              <div className="bg-gradient-to-r from-brand-50 to-purple-50 border border-brand-200 rounded-xl p-6">
+              <div className="bg-gradient-to-r from-primary-50 to-purple-50 border border-primary-200 rounded-xl p-6">
                 <div className="flex items-center gap-2 mb-2">
-                  <Icon name={bridge.icon} size={20} className="text-brand-600" />
-                  <span className="font-bold text-brand-800">{bridge.bridgeName}</span>
-                  <span className="ml-auto text-sm text-brand-600 font-semibold">{weakest.title}: {weakest.pct}%</span>
+                  <Icon name={bridge.icon} size={20} className="text-primary-600" />
+                  <span className="font-bold text-primary-800">{bridge.bridgeName}</span>
+                  <span className="ml-auto text-sm text-primary-600 font-semibold">{weakest.title}: {weakest.pct}%</span>
                 </div>
                 <p className="text-gray-700 leading-relaxed mb-3">{bigWin}</p>
                 <p className="text-sm text-gray-500 italic">Your full report includes a detailed gap analysis, action items, and a 90-day transformation roadmap...</p>
@@ -805,13 +855,13 @@
               </div>
               {/* Overlay CTA */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="bg-gradient-to-br from-brand-900 via-brand-800 to-brand-900 rounded-2xl shadow-2xl p-8 md:p-10 text-center max-w-lg mx-4">
+                <div className="bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 rounded-2xl shadow-2xl p-8 md:p-10 text-center max-w-lg mx-4">
                   <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-white/10 mb-4">
                     <Icon name="FileText" size={28} className="text-white" />
                   </div>
                   <h3 className="text-2xl font-bold text-white mb-2">Get Your Custom Transformation Roadmap</h3>
-                  <p className="text-brand-200 mb-6 text-sm leading-relaxed">Unlock a comprehensive 5-page report with detailed gap analysis, bridge strategies, ROI projections, and a 90-day action plan tailored to your results.</p>
-                  <button onClick={onUnlock} className="inline-flex items-center gap-2 bg-white text-brand-900 font-semibold px-8 py-3.5 rounded-xl hover:bg-brand-50 shadow-lg transition-all">
+                  <p className="text-primary-200 mb-6 text-sm leading-relaxed">Unlock a comprehensive 5-page report with detailed gap analysis, bridge strategies, ROI projections, and a 90-day action plan tailored to your results.</p>
+                  <button onClick={onUnlock} className="inline-flex items-center gap-2 bg-white text-primary-900 font-semibold px-8 py-3.5 rounded-xl hover:bg-primary-50 shadow-lg transition-all">
                     <Icon name="Lock" size={18} /> Unlock Full Report
                   </button>
                 </div>
@@ -860,31 +910,31 @@
       };
 
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-950 via-brand-900 to-brand-800 px-4">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-950 via-primary-900 to-primary-800 px-4">
           <div className="max-w-md w-full slide-up">
             <div className="text-center mb-8">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 backdrop-blur mb-4"><Icon name="FileText" size={32} className="text-white" /></div>
               <h1 className="text-3xl font-extrabold text-white mb-2">Your Report Is Ready</h1>
-              <p className="text-brand-200">Enter your details below to download your personalized 5-page CX Transformation Roadmap.</p>
+              <p className="text-primary-200">Enter your details below to download your personalized 5-page CX Transformation Roadmap.</p>
             </div>
             <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-2xl p-8 space-y-5">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Full Name *</label>
-                <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Jane Smith" className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition text-gray-800" />
+                <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Jane Smith" className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition text-gray-800" />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Work Email *</label>
-                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="jane@company.com" className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition text-gray-800" />
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="jane@company.com" className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition text-gray-800" />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Company <span className="text-gray-400 font-normal">(optional)</span></label>
-                <input type="text" value={company} onChange={e => setCompany(e.target.value)} placeholder="Acme Corp" className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition text-gray-800" />
+                <input type="text" value={company} onChange={e => setCompany(e.target.value)} placeholder="Acme Corp" className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition text-gray-800" />
               </div>
               {error && <p className="text-red-600 text-sm font-medium">{error}</p>}
-              <button type="submit" disabled={submitting} className="w-full flex items-center justify-center gap-2 bg-brand-600 text-white font-semibold py-3.5 rounded-xl hover:bg-brand-700 shadow-lg shadow-brand-200 transition-all disabled:opacity-60">
+              <button type="submit" disabled={submitting} className="w-full flex items-center justify-center gap-2 bg-primary-600 text-white font-semibold py-3.5 rounded-xl hover:bg-primary-700 shadow-lg shadow-primary-200 transition-all disabled:opacity-60">
                 {submitting ? 'Generating...' : <><Icon name="Download" size={18} /> Download Full Report</>}
               </button>
-              <button type="button" onClick={onBack} className="w-full text-center text-sm text-gray-500 hover:text-brand-700 transition-colors pt-1">Back to summary</button>
+              <button type="button" onClick={onBack} className="w-full text-center text-sm text-gray-500 hover:text-primary-700 transition-colors pt-1">Back to summary</button>
             </form>
           </div>
         </div>
@@ -902,10 +952,10 @@
 
       // ── Report Header (reused) ──
       const ReportHeader = ({ pageNum }) => (
-        <div className="flex items-center justify-between mb-8 pb-4 border-b-2 border-brand-600">
+        <div className="flex items-center justify-between mb-8 pb-4 border-b-2 border-primary-600">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center"><Icon name="Headphones" size={16} className="text-white" /></div>
-            <span className="font-bold text-brand-900 text-sm">CX Maturity Assessment Report</span>
+            <div className="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center"><Icon name="Headphones" size={16} className="text-white" /></div>
+            <span className="font-bold text-primary-900 text-sm">CX Maturity Assessment Report</span>
           </div>
           <span className="text-xs text-gray-400">Page {pageNum} of 5</span>
         </div>
@@ -923,10 +973,10 @@
           {/* Top Bar (no-print) */}
           <div className="no-print bg-white border-b border-gray-200 sticky top-0 z-20">
             <div className="max-w-[850px] mx-auto px-4 py-3 flex items-center justify-between">
-              <h1 className="text-lg font-bold text-gray-900 flex items-center gap-2"><Icon name="FileText" size={20} className="text-brand-600" />Your CX Transformation Report</h1>
+              <h1 className="text-lg font-bold text-gray-900 flex items-center gap-2"><Icon name="FileText" size={20} className="text-primary-600" />Your CX Transformation Report</h1>
               <div className="flex gap-3">
-                <button onClick={() => window.print()} className="flex items-center gap-2 bg-brand-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-brand-700 text-sm transition-all"><Icon name="Printer" size={16} />Print / Save PDF</button>
-                <button onClick={onRestart} className="flex items-center gap-2 text-gray-600 hover:text-brand-700 px-4 py-2 rounded-lg text-sm border border-gray-200 hover:border-brand-300 transition-all"><Icon name="RotateCcw" size={16} />Retake</button>
+                <button onClick={() => window.print()} className="flex items-center gap-2 bg-primary-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-primary-700 text-sm transition-all"><Icon name="Printer" size={16} />Print / Save PDF</button>
+                <button onClick={onRestart} className="flex items-center gap-2 text-gray-600 hover:text-primary-700 px-4 py-2 rounded-lg text-sm border border-gray-200 hover:border-primary-300 transition-all"><Icon name="RotateCcw" size={16} />Retake</button>
               </div>
             </div>
           </div>
@@ -938,10 +988,10 @@
               <ReportHeader pageNum={1} />
 
               {/* Title block */}
-              <div className="bg-gradient-to-r from-brand-900 via-brand-800 to-brand-900 rounded-xl p-8 text-white text-center mb-8">
+              <div className="bg-gradient-to-r from-primary-900 via-primary-800 to-primary-900 rounded-xl p-8 text-white text-center mb-8">
                 <h2 className="text-3xl font-extrabold mb-1">CX Maturity Assessment</h2>
-                <h3 className="text-xl font-semibold text-brand-200 mb-1">Executive Summary</h3>
-                <p className="text-brand-300 text-sm">{dateStr} {leadData.company ? `| ${leadData.company}` : ''}</p>
+                <h3 className="text-xl font-semibold text-primary-200 mb-1">Executive Summary</h3>
+                <p className="text-primary-300 text-sm">{dateStr} {leadData.company ? `| ${leadData.company}` : ''}</p>
               </div>
 
               <div className="grid md:grid-cols-2 gap-8 mb-8">
@@ -974,10 +1024,10 @@
                 <div className="space-y-3">
                   {sectionScores.map(s => (
                     <div key={s.id} className="flex items-center gap-3">
-                      <Icon name={s.icon} size={16} className="text-brand-600" />
+                      <Icon name={s.icon} size={16} className="text-primary-600" />
                       <span className="text-sm font-medium text-gray-700 w-40">{s.title}</span>
-                      <div className="flex-1 h-2.5 bg-gray-200 rounded-full overflow-hidden"><div className="h-full rounded-full bg-gradient-to-r from-brand-500 to-brand-400" style={{ width: `${s.pct}%` }} /></div>
-                      <span className="text-sm font-bold text-brand-700 w-12 text-right">{s.pct}%</span>
+                      <div className="flex-1 h-2.5 bg-gray-200 rounded-full overflow-hidden"><div className="h-full rounded-full bg-gradient-to-r from-primary-500 to-primary-400" style={{ width: `${s.pct}%` }} /></div>
+                      <span className="text-sm font-bold text-primary-700 w-12 text-right">{s.pct}%</span>
                     </div>
                   ))}
                 </div>
@@ -998,12 +1048,12 @@
                   <div key={sec.id} className="border border-gray-200 rounded-xl overflow-hidden">
                     <div className={`flex items-center justify-between px-5 py-3 ${sec.pct >= 75 ? 'bg-green-50' : sec.pct >= 50 ? 'bg-yellow-50' : sec.pct >= 25 ? 'bg-orange-50' : 'bg-red-50'}`}>
                       <div className="flex items-center gap-2">
-                        <Icon name={sec.icon} size={18} className="text-brand-700" />
+                        <Icon name={sec.icon} size={18} className="text-primary-700" />
                         <span className="font-bold text-gray-900">{sec.title}</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <div className="w-24 h-2 bg-white/60 rounded-full overflow-hidden"><div className="h-full rounded-full bg-brand-600" style={{ width: `${sec.pct}%` }} /></div>
-                        <span className="font-bold text-brand-700 text-sm">{sec.pct}%</span>
+                        <div className="w-24 h-2 bg-white/60 rounded-full overflow-hidden"><div className="h-full rounded-full bg-primary-600" style={{ width: `${sec.pct}%` }} /></div>
+                        <span className="font-bold text-primary-700 text-sm">{sec.pct}%</span>
                         <span className="text-xs px-2 py-0.5 rounded-full bg-white font-semibold text-gray-600">Gap: {100 - sec.pct}pts</span>
                       </div>
                     </div>
@@ -1041,34 +1091,34 @@
                 return (
                   <div key={sec.id} className="mb-8 last:mb-0">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-xl bg-brand-100 flex items-center justify-center"><Icon name={bl.icon} size={22} className="text-brand-700" /></div>
+                      <div className="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center"><Icon name={bl.icon} size={22} className="text-primary-700" /></div>
                       <div>
                         <h3 className="font-extrabold text-gray-900 text-lg leading-tight">{bl.bridgeName}</h3>
-                        <span className="text-xs text-brand-600 font-semibold">{sec.title} — Current Score: {sec.pct}%</span>
+                        <span className="text-xs text-primary-600 font-semibold">{sec.title} — Current Score: {sec.pct}%</span>
                       </div>
                     </div>
 
                     <p className="text-gray-800 font-semibold mb-2">{bl.headline}</p>
                     <p className="text-sm text-gray-600 leading-relaxed mb-4">{bl.situation}</p>
 
-                    <div className="bg-brand-50 border-l-4 border-brand-600 rounded-r-lg p-4 mb-4">
-                      <h4 className="text-sm font-bold text-brand-900 mb-1">Industry Insight</h4>
-                      <p className="text-sm text-brand-800 leading-relaxed">{bl.insight}</p>
+                    <div className="bg-primary-50 border-l-4 border-primary-600 rounded-r-lg p-4 mb-4">
+                      <h4 className="text-sm font-bold text-primary-900 mb-1">Industry Insight</h4>
+                      <p className="text-sm text-primary-800 leading-relaxed">{bl.insight}</p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-2 mb-4">
                       {bl.keyMetrics.map((m, i) => (
                         <div key={i} className="flex items-start gap-2 bg-gray-50 rounded-lg p-3">
-                          <Icon name="TrendingUp" size={14} className="text-brand-600 mt-0.5 flex-shrink-0" />
+                          <Icon name="TrendingUp" size={14} className="text-primary-600 mt-0.5 flex-shrink-0" />
                           <span className="text-xs text-gray-700 font-medium leading-snug">{m}</span>
                         </div>
                       ))}
                     </div>
 
-                    <h4 className="font-bold text-gray-900 text-sm mb-2 flex items-center gap-1"><Icon name="ListChecks" size={16} className="text-brand-600" />Priority Action Items</h4>
+                    <h4 className="font-bold text-gray-900 text-sm mb-2 flex items-center gap-1"><Icon name="ListChecks" size={16} className="text-primary-600" />Priority Action Items</h4>
                     <ul className="space-y-1.5 mb-4">
                       {bl.actions.map((a, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-gray-600"><span className="flex-shrink-0 w-5 h-5 rounded-full bg-brand-100 text-brand-700 text-xs font-bold flex items-center justify-center mt-0.5">{i + 1}</span><span className="leading-snug">{a}</span></li>
+                        <li key={i} className="flex items-start gap-2 text-sm text-gray-600"><span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary-100 text-primary-700 text-xs font-bold flex items-center justify-center mt-0.5">{i + 1}</span><span className="leading-snug">{a}</span></li>
                       ))}
                     </ul>
 
@@ -1098,18 +1148,18 @@
                 return (
                   <div key={sec.id} className="mb-6 last:mb-0">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${isStrong ? 'bg-green-100' : 'bg-brand-100'}`}><Icon name={bl.icon} size={18} className={isStrong ? 'text-green-700' : 'text-brand-700'} /></div>
+                      <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${isStrong ? 'bg-green-100' : 'bg-primary-100'}`}><Icon name={bl.icon} size={18} className={isStrong ? 'text-green-700' : 'text-primary-700'} /></div>
                       <div>
                         <h3 className="font-bold text-gray-900">{isStrong ? `Maintain: ${sec.title}` : bl.bridgeName}</h3>
-                        <span className={`text-xs font-semibold ${isStrong ? 'text-green-600' : 'text-brand-600'}`}>{sec.title} — {sec.pct}%</span>
+                        <span className={`text-xs font-semibold ${isStrong ? 'text-green-600' : 'text-primary-600'}`}>{sec.title} — {sec.pct}%</span>
                       </div>
                     </div>
 
                     {!isStrong && (
                       <>
                         <p className="text-sm text-gray-600 leading-relaxed mb-3">{bl.insight}</p>
-                        <div className="bg-brand-50 border-l-4 border-brand-500 rounded-r-lg p-3 mb-3">
-                          <p className="text-sm text-brand-800 font-medium">{bl.dialpadFit}</p>
+                        <div className="bg-primary-50 border-l-4 border-primary-500 rounded-r-lg p-3 mb-3">
+                          <p className="text-sm text-primary-800 font-medium">{bl.dialpadFit}</p>
                         </div>
                       </>
                     )}
@@ -1118,7 +1168,7 @@
                     <ul className="space-y-1.5">
                       {(SECTION_RECS[sec.id] || []).slice(0, isStrong ? 2 : 4).map((rec, j) => (
                         <li key={j} className="flex items-start gap-2 text-sm text-gray-600">
-                          <Icon name={isStrong ? 'Check' : 'ChevronRight'} size={14} className={`${isStrong ? 'text-green-500' : 'text-brand-500'} mt-0.5 flex-shrink-0`} />
+                          <Icon name={isStrong ? 'Check' : 'ChevronRight'} size={14} className={`${isStrong ? 'text-green-500' : 'text-primary-500'} mt-0.5 flex-shrink-0`} />
                           <span className="leading-snug">{rec}</span>
                         </li>
                       ))}
@@ -1157,7 +1207,7 @@
 
               {/* Timeline */}
               {[
-                { phase: 'Phase 1', period: 'Days 1–30', title: 'Foundation', color: 'brand', bgColor: 'bg-brand-50', borderColor: 'border-brand-200', textColor: 'text-brand-700', section: sorted[0], description: `Focus on your biggest gap: ${sorted[0].title} (${sorted[0].pct}%). Establish the foundational capabilities needed to close this critical gap.`, actions: (BRIDGE_LOGIC[sorted[0].id]?.actions || []).slice(0, 3) },
+                { phase: 'Phase 1', period: 'Days 1–30', title: 'Foundation', color: 'primary', bgColor: 'bg-primary-50', borderColor: 'border-primary-200', textColor: 'text-primary-700', section: sorted[0], description: `Focus on your biggest gap: ${sorted[0].title} (${sorted[0].pct}%). Establish the foundational capabilities needed to close this critical gap.`, actions: (BRIDGE_LOGIC[sorted[0].id]?.actions || []).slice(0, 3) },
                 { phase: 'Phase 2', period: 'Days 31–60', title: 'Acceleration', color: 'purple', bgColor: 'bg-purple-50', borderColor: 'border-purple-200', textColor: 'text-purple-700', section: sorted[1], description: `Address your second priority: ${sorted[1].title} (${sorted[1].pct}%). Build on Phase 1 momentum to accelerate capability development.`, actions: (BRIDGE_LOGIC[sorted[1].id]?.actions || []).slice(0, 3) },
                 { phase: 'Phase 3', period: 'Days 61–90', title: 'Optimization', color: 'emerald', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-200', textColor: 'text-emerald-700', section: sorted[2], description: `Consolidate remaining areas starting with ${sorted[2].title} (${sorted[2].pct}%). Optimize across all dimensions and establish continuous improvement processes.`, actions: (BRIDGE_LOGIC[sorted[2].id]?.actions || []).slice(0, 3) },
               ].map((ph, idx) => (
@@ -1194,7 +1244,7 @@
                     { metric: '30hrs', label: 'Saved per agent/month' },
                   ].map((o, i) => (
                     <div key={i} className="text-center bg-white rounded-lg p-3 border border-gray-200">
-                      <div className="text-xl font-extrabold text-brand-700">{o.metric}</div>
+                      <div className="text-xl font-extrabold text-primary-700">{o.metric}</div>
                       <div className="text-xs text-gray-500 mt-1">{o.label}</div>
                     </div>
                   ))}
@@ -1202,10 +1252,10 @@
               </div>
 
               {/* Dialpad CTA */}
-              <div className="bg-gradient-to-r from-brand-900 via-brand-800 to-brand-900 rounded-xl p-8 text-center">
+              <div className="bg-gradient-to-r from-primary-900 via-primary-800 to-primary-900 rounded-xl p-8 text-center">
                 <h3 className="text-2xl font-bold text-white mb-2">Ready to Start Your Transformation?</h3>
-                <p className="text-brand-200 mb-5 max-w-xl mx-auto text-sm leading-relaxed">Dialpad's AI-native platform — powered by DialpadGPT — delivers the unified, intelligent CX infrastructure your organization needs to reach Visionary status.</p>
-                <a href="https://www.dialpad.com" target="_blank" rel="noopener noreferrer" className="no-print inline-flex items-center gap-2 bg-white text-brand-900 font-semibold px-8 py-3 rounded-xl hover:bg-brand-50 shadow-lg transition-all text-sm">
+                <p className="text-primary-200 mb-5 max-w-xl mx-auto text-sm leading-relaxed">Dialpad's AI-native platform — powered by DialpadGPT — delivers the unified, intelligent CX infrastructure your organization needs to reach Visionary status.</p>
+                <a href="https://www.dialpad.com" target="_blank" rel="noopener noreferrer" className="no-print inline-flex items-center gap-2 bg-white text-primary-900 font-semibold px-8 py-3 rounded-xl hover:bg-primary-50 shadow-lg transition-all text-sm">
                   Explore Dialpad <Icon name="ExternalLink" size={16} />
                 </a>
               </div>
@@ -1217,8 +1267,8 @@
 
           {/* Bottom bar (no-print) */}
           <div className="no-print bg-white border-t border-gray-200 py-6 text-center">
-            <button onClick={() => window.print()} className="inline-flex items-center gap-2 bg-brand-600 text-white font-semibold px-8 py-3 rounded-xl hover:bg-brand-700 shadow-lg shadow-brand-200 transition-all mr-4"><Icon name="Printer" size={18} />Print / Save as PDF</button>
-            <button onClick={onRestart} className="inline-flex items-center gap-2 text-gray-600 hover:text-brand-700 px-6 py-3 rounded-xl border border-gray-200 hover:border-brand-300 transition-all"><Icon name="RotateCcw" size={18} />Retake Assessment</button>
+            <button onClick={() => window.print()} className="inline-flex items-center gap-2 bg-primary-600 text-white font-semibold px-8 py-3 rounded-xl hover:bg-primary-700 shadow-lg shadow-primary-200 transition-all mr-4"><Icon name="Printer" size={18} />Print / Save as PDF</button>
+            <button onClick={onRestart} className="inline-flex items-center gap-2 text-gray-600 hover:text-primary-700 px-6 py-3 rounded-xl border border-gray-200 hover:border-primary-300 transition-all"><Icon name="RotateCcw" size={18} />Retake Assessment</button>
           </div>
         </div>
       );
