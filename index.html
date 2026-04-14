@@ -700,24 +700,38 @@
     // ─── Landing Page ────────────────────────────────────────────────
     function LandingPage({ onStart }) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-950 via-primary-900 to-primary-800 px-4">
-          <div className="max-w-2xl w-full text-center slide-up">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white/10 backdrop-blur mb-8">
-              <Icon name="Headphones" size={40} className="text-white" />
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-purple-700 to-purple-600 px-4 relative overflow-hidden">
+          {/* Decorative gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
+          
+          <div className="max-w-2xl w-full text-center slide-up relative z-10">
+            {/* Icon with enhanced contrast */}
+            <div className="inline-flex items-center justify-center w-24 h-24 rounded-2xl bg-gradient-to-br from-yellow-300 to-orange-400 shadow-2xl mb-8">
+              <Icon name="Headphones" size={48} className="text-purple-900" />
             </div>
-            <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 leading-tight">Contact Center<br />CX Maturity Assessment</h1>
-            <p className="text-lg text-primary-200 mb-8 max-w-lg mx-auto leading-relaxed">Benchmark your customer experience operations against AI-native industry leaders. Get a personalized maturity score and actionable recommendations in under 5 minutes.</p>
-            <div className="flex flex-wrap justify-center gap-4 mb-10">
+            
+            {/* Main heading with white text for maximum contrast */}
+            <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-6 leading-tight drop-shadow-lg">Contact Center<br />CX Maturity Assessment</h1>
+            
+            {/* Description with high contrast */}
+            <p className="text-xl text-yellow-100 mb-10 max-w-lg mx-auto leading-relaxed font-medium drop-shadow">Benchmark your customer experience operations against AI-native industry leaders. Get a personalized maturity score and actionable recommendations in under 5 minutes.</p>
+            
+            {/* Section pills with better contrast */}
+            <div className="flex flex-wrap justify-center gap-3 mb-12">
               {SECTIONS.map((s) => (
-                <div key={s.id} className="flex items-center gap-2 bg-white/10 backdrop-blur rounded-full px-4 py-2 text-sm text-primary-100">
-                  <Icon name={s.icon} size={16} className="text-primary-300" />{s.title}
+                <div key={s.id} className="flex items-center gap-2 bg-white/20 backdrop-blur rounded-full px-4 py-2 text-sm text-white font-medium border border-white/30">
+                  <Icon name={s.icon} size={16} className="text-yellow-200" />{s.title}
                 </div>
               ))}
             </div>
-            <button onClick={onStart} className="group inline-flex items-center gap-3 bg-white text-primary-900 font-semibold text-lg px-8 py-4 rounded-xl shadow-lg shadow-primary-900/30 hover:shadow-xl hover:shadow-primary-900/40 hover:bg-primary-50 transition-all duration-200">
-              Start Assessment <Icon name="ArrowRight" size={20} className="text-primary-700 group-hover:translate-x-1 transition-transform" />
+            
+            {/* CTA button with strong contrast */}
+            <button onClick={onStart} className="group inline-flex items-center gap-3 bg-gradient-to-r from-yellow-300 to-orange-400 text-purple-900 font-bold text-lg px-10 py-5 rounded-2xl shadow-2xl hover:shadow-3xl hover:scale-105 transition-all duration-200">
+              Start Assessment <Icon name="ArrowRight" size={20} className="text-purple-900 group-hover:translate-x-1 transition-transform" />
             </button>
-            <p className="text-primary-400 text-sm mt-6">25 questions &middot; ~5 minutes &middot; No sign-up required</p>
+            
+            {/* Footer text with high contrast */}
+            <p className="text-yellow-100 text-base mt-8 font-medium drop-shadow">25 questions &middot; ~5 minutes &middot; No sign-up required</p>
           </div>
         </div>
       );
